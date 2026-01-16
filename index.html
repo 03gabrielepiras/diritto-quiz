@@ -416,27 +416,70 @@
     .toast .tclose{ margin-left:auto; }
   
     /* Mobile: barra controlli fissa in basso (più comoda) */
+    
     @media (max-width: 520px) {
+      /* lascia spazio in fondo così la barra non copre contenuti */
+      .card .body { padding-bottom: 140px; }
+
+      /* barra comandi morbida e leggibile */
       .controls {
-        position: sticky;
-        bottom: calc(10px + env(safe-area-inset-bottom));
-        padding: 10px;
-        margin: 0 -6px -6px;
-        border-radius: 16px;
-        background: rgba(255,255,255,.92);
-        border: 1px solid rgba(11,29,58,.10);
-        box-shadow: 0 18px 40px rgba(0,0,0,.18);
+        position: fixed;
+        left: 12px;
+        right: 12px;
+        bottom: calc(12px + env(safe-area-inset-bottom));
+        z-index: 40;
+
+        padding: 12px;
+        border-radius: 18px;
+        background: rgba(255,255,255,.96);
+        border: 1px solid rgba(11,29,58,.12);
+        box-shadow: 0 18px 50px rgba(0,0,0,.22);
+        backdrop-filter: blur(10px);
+
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr 1fr 1fr;
         gap: 10px;
       }
-      .controls .left, .controls .right {
-        width: 100%;
-        justify-content: space-between;
-      }
-      .controls .left { grid-column: 1 / span 2; }
+
+      /* layout: 3 bottoni principali in prima riga, modalità in seconda (se presente) */
+      .controls .left, .controls .right { display: contents; }
+      .controls .btn { width: 100%; justify-content: center; }
+
+      /* il bottone modalità (di solito a destra) va sotto, a tutta larghezza */
+      #toggleModeBtn { grid-column: 1 / span 3; }
+      #revealBtn { grid-column: 1 / span 3; }
+    }
+    .controls .left { grid-column: 1 / span 2; }
       .controls .right { grid-column: 1 / span 2; justify-content: space-between; }
       .controls .btn { width: 100%; justify-content: center; }
+    }
+
+  
+    /* iPhone fix: bottoni su card chiara -> testo scuro + look morbido */
+    .card .btn{
+      color: #0b1d3a;
+      background: rgba(11,29,58,.06);
+      border-color: rgba(11,29,58,.14);
+      box-shadow: 0 10px 18px rgba(0,0,0,.08);
+    }
+    .card .btn:hover{ background: rgba(11,29,58,.09); }
+    .card .btn.primary{
+      color: white;
+      background: linear-gradient(135deg, rgba(11,29,58,.98), rgba(31,122,99,.90));
+      border-color: rgba(11,29,58,.35);
+      box-shadow: 0 14px 26px rgba(11,29,58,.25);
+    }
+    .card .btn.danger{
+      color: white;
+      background: linear-gradient(135deg, rgba(190,18,60,.95), rgba(251,113,133,.80));
+      border-color: rgba(190,18,60,.35);
+    }
+
+  
+    @media (max-width: 520px) {
+      .opt { padding: 14px; }
+      .badge { width: 38px; height: 38px; border-radius: 14px; font-size: 14px; }
+      .prompt { font-size: 18px; }
     }
 
   </style>
