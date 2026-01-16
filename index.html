@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <title>Quiz Diritto — Mobile Premium</title>
   <style>
     :root {
@@ -642,6 +642,14 @@
 
     /* Toast sempre con X visibile */
     #toastClose { display: inline-flex !important; }
+
+  
+    /* iOS: riduci zoom accidentale su tap */
+    button, .btn, .opt, .qbtn, .chip, .badge {
+      touch-action: manipulation;
+      -webkit-user-select: none;
+      user-select: none;
+    }
 
   </style>
 </head>
@@ -1488,6 +1496,62 @@
   if (pauseResumeBtn) pauseResumeBtn.addEventListener('click', hidePause);
   if (pauseCloseBtn) pauseCloseBtn.addEventListener('click', hidePause);
   if (pauseOverlay) pauseOverlay.addEventListener('click', (e)=>{ if(e.target === pauseOverlay) hidePause(); });
+})();
+</script>
+
+
+<script>
+(function(){
+  // --- Double-tap zoom killer (iOS Safari) ---
+  let lastTouchEnd = 0;
+  document.addEventListener('touchend', function(e){
+    const now = Date.now();
+    if (now - lastTouchEnd <= 300) {
+      e.preventDefault();
+    }
+    lastTouchEnd = now;
+  }, {passive:false});
+
+  // --- Modal close safety: always allow closing overlay with X and tap outside ---
+  function hide(el){
+    if(!el) return;
+    el.classList.remove('show');
+    el.style.display = '';
+    // for overlays that use class show only:
+    try{ el.classList.remove('open'); }catch(e){}
+  }
+  const overlay = document.getElementById('overlay');
+  const closeModal = document.getElementById('closeModal');
+  if (closeModal && overlay){
+    closeModal.addEventListener('click', ()=> hide(overlay));
+  }
+  if (overlay){
+    overlay.addEventListener('click', (e)=>{ if(e.target===overlay) hide(overlay); });
+  }
+
+  // --- Auto-finish in Verifica after last question answered ---
+  // We hook clicks on option cards; after a short delay check if mode is exam and we are at last question and answered.
+  document.addEventListener('click', function(e){
+    const opt = e.target.closest && e.target.closest('.opt');
+    if(!opt) return;
+
+    setTimeout(()=>{
+      try{
+        // These are globals in the main app script:
+        if (typeof mode !== 'undefined' && mode === 'exam' && typeof idx !== 'undefined' && typeof pool !== 'undefined') {
+          // If we're on last question (index pool.length-1) and it's answered, auto open results
+          if (idx === pool.length - 1) {
+            const q = pool[idx];
+            if (typeof answers !== 'undefined' && answers && answers.get && answers.get(q.number)?.chosen) {
+              // trigger existing end button action
+              const endBtn = document.getElementById('endBtn');
+              if (endBtn) endBtn.click();
+            }
+          }
+        }
+      }catch(err){}
+    }, 120);
+  }, true);
 })();
 </script>
 
