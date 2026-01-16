@@ -652,6 +652,21 @@
       user-select: none;
     }
 
+  
+    /* === V15 ULTRA MINIMAL === */
+    body{ background:#0b1d3a !important; }
+    .topbar{ backdrop-filter:none !important; background:#0b1d3a !important; border-bottom:1px solid rgba(255,255,255,.12) !important; }
+    .logo{ box-shadow:none !important; background:rgba(255,255,255,.08) !important; }
+    .sidebar{ background:rgba(255,255,255,.06) !important; box-shadow:none !important; }
+    .card{ box-shadow:none !important; border:1px solid rgba(0,0,0,.10) !important; }
+    .opt{ box-shadow:none !important; }
+    .btn{ box-shadow:none !important; }
+    .progress>div{ background:#4cc9f0 !important; }
+    .opt{ background:#f3f4f6 !important; }
+    .badge{ background:#e5e7eb !important; }
+    .toast, .overlay{ box-shadow:none !important; }
+    .chip{ box-shadow:none !important; }
+
   </style>
 </head>
 <body>
@@ -991,33 +1006,18 @@ function showDidYouKnow() {
           startEpoch,
           elapsedMs,
         };
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+        /* storage disabled */
       } catch (e) {}
     }
 
-    function loadState() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return false;
-        const obj = JSON.parse(raw);
-        if (!obj) return false;
-
-        mode = obj.mode || 'train';
-        filter = obj.filter || 'all';
-        idx = Number.isFinite(obj.idx) ? obj.idx : 0;
-        answers = new Map((obj.answers || []).map(([k,v]) => [Number(k), v]));
-
-        started = !!obj.started;
-        startEpoch = obj.startEpoch || null;
-        elapsedMs = obj.elapsedMs || 0;
-        return true;
-      } catch (e) {
+    function loadState(){ return false; }
+catch (e) {
         return false;
       }
     }
 
     function clearState() {
-      try { localStorage.removeItem(STORAGE_KEY); } catch(e){}
+      try { /* storage disabled */ } catch(e){}
     }
 
     // ====== UI BUILDERS ======
@@ -1433,9 +1433,7 @@ function showDidYouKnow() {
     }
 
     // autosave periodically (for iPhone reload)
-    setInterval(saveState, 2000);
-
-  </script>
+    </script>
 
   <!-- Pause overlay (iOS-friendly) -->
   <div class="overlay" id="pauseOverlay" style="display:none; z-index:90;">
@@ -1753,6 +1751,28 @@ function showDidYouKnow() {
       };
     }
   }catch(e){}
+})();
+</script>
+
+
+<script>
+// Reset hard on iOS BFCache restore
+window.addEventListener('pageshow', function(e){
+  if (e.persisted) {
+    location.reload();
+  }
+});
+</script>
+
+
+<script>
+(function(){
+  const btn = document.getElementById('restartBtn');
+  if(!btn) return;
+  btn.addEventListener('click', function(){
+    // Hard reset: reload page to ensure fresh state
+    location.reload(true);
+  });
 })();
 </script>
 
