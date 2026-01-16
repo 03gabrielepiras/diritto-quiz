@@ -307,7 +307,7 @@
       justify-content: center;
       padding: 16px;
     }
-    .overlay.show{ display:flex; }
+    .overlay.show{ display:none; }
     .modal{
       width: min(720px, 100%);
       background: white;
@@ -401,7 +401,8 @@
       z-index: 70;
       animation: pop .22s ease both;
     }
-    .toast.show{ display:block; }
+    .toast.show{ display:none !important; }
+    .toast{ display:none !important; }
     .toast .trow{ display:flex; gap: 10px; align-items:flex-start; }
     .toast .ticon{
       width: 38px; height: 38px;
@@ -721,6 +722,15 @@
             <div style="margin-top:10px;font-size:12px;color:rgba(11,29,58,.72)" id="revealExplain"></div>
           </div>
 
+          <div class="reveal" id="inlineTip" style="display:none;">
+            <div style="font-weight:950;margin-bottom:6px">💡 Lo sapevi che?</div>
+            <div id="inlineTipText" style="line-height:1.4"></div>
+            <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn" id="inlineTipClose" type="button">✕ Chiudi</button>
+              <button class="btn primary" id="inlineTipNext" type="button">Altra curiosità</button>
+            </div>
+          </div>
+
           <div class="controls">
             <div class="left">
               <button class="btn" id="prevBtn">← Indietro</button>
@@ -733,6 +743,18 @@
           </div>
         </div>
       </section>
+    
+      <section class="card" id="inlineResults" style="display:none;">
+        <div class="meta">
+          <div class="row">
+            <div class="pill">📊 Risultati</div>
+            <div class="pill">🧾 Fine verifica</div>
+          </div>
+          <div class="progress"><div id="finalBarInline" style="width:0%"></div></div>
+        </div>
+        <div class="body" id="inlineBody" style="display:grid; gap:12px;"></div>
+      </section>
+
     </main>
   </div>
 
@@ -935,13 +957,17 @@
       return Math.round(raw * 2) / 2; // nearest 0.5
     }
 
-    function showToast(text) {
-      toastText.textContent = text;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 5200);
+    function showToast(text){
+      const panel = document.getElementById('inlineTip');
+      const txt = document.getElementById('inlineTipText');
+      if (panel && txt){
+        txt.textContent = text;
+        panel.style.display = 'block';
+        // ensure visible without jumping too much
+        panel.scrollIntoView({behavior:'smooth', block:'nearest'});
+      }
     }
-
-    function showDidYouKnow() {
+function showDidYouKnow() {
       const pick = DID_YOU_KNOW[Math.floor(Math.random() * DID_YOU_KNOW.length)];
       showToast(`${pick.icon} ${pick.text}`);
     }
@@ -1552,6 +1578,181 @@
       }catch(err){}
     }, 120);
   }, true);
+})();
+</script>
+
+
+<script>
+(function(){
+  function esc(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function grade(score,total){
+    const raw = (total ? (score/total) : 0) * 10;
+    return Math.round(raw*2)/2;
+  }
+  function chapterOf(n){
+    const CHAPTERS = [
+      { id:'c1', label:'⚖️ Stato e legalità', range:[1,10] },
+      { id:'c2', label:'👤 Persona e capacità', range:[11,35] },
+      { id:'c3', label:'🏛️ Stato e governo', range:[36,60] },
+      { id:'c4', label:'🧠 Consolidamento', range:[61,90] },
+    ];
+    for (const c of CHAPTERS) if (n>=c.range[0] && n<=c.range[1]) return c;
+    return {label:'Altro', range:[-1,-1]};
+  }
+
+  const inline = document.getElementById('inlineResults');
+  const inlineBody = document.getElementById('inlineBody');
+  const finalBarInline = document.getElementById('finalBarInline');
+
+  function computeInline(){
+    // Use globals from app if available: pool, answers, timerText
+    if (!inline || !inlineBody || typeof pool === 'undefined' || typeof answers === 'undefined') return;
+
+    const total = pool.length;
+    let score = 0, answered = 0;
+    pool.forEach(q => {
+      const a = answers.get(q.number);
+      if (a && a.chosen){
+        answered++;
+        if (a.correct) score++;
+      }
+    });
+    const pct = total ? (score/total)*100 : 0;
+
+    if (finalBarInline) finalBarInline.style.width = pct.toFixed(1) + '%';
+
+    // chapter stats
+    const ch = [
+      {label:'⚖️ Stato e legalità', qs: pool.filter(q=>q.number>=1 && q.number<=10)},
+      {label:'👤 Persona e capacità', qs: pool.filter(q=>q.number>=11 && q.number<=35)},
+      {label:'🏛️ Stato e governo', qs: pool.filter(q=>q.number>=36 && q.number<=60)},
+      {label:'🧠 Consolidamento', qs: pool.filter(q=>q.number>=61 && q.number<=90)},
+    ];
+    const stats = ch.map(c=>{
+      let ok=0, done=0;
+      c.qs.forEach(q=>{
+        const a = answers.get(q.number);
+        if (a && a.chosen){ done++; if (a.correct) ok++; }
+      });
+      const acc = done ? ok/done : null;
+      return {label:c.label, ok, done, acc};
+    }).filter(s=>s.done>0);
+
+    // advice = worst chapter acc
+    let advice = "Completa più domande per ricevere un consiglio mirato.";
+    if (stats.length){
+      const worst = [...stats].sort((a,b)=> (a.acc??1) - (b.acc??1))[0];
+      const accPct = Math.round((worst.acc??0)*100);
+      advice = `Rivedi prima ${worst.label}: accuratezza ${accPct}%. Ripassa le KEY WORDS e rifai solo le sbagliate.`;
+    }
+
+    // wrong list
+    const wrong = pool.filter(q=>{
+      const a = answers.get(q.number);
+      return a && a.chosen && !a.correct;
+    });
+
+    const time = (window.timerText && timerText.textContent) ? timerText.textContent : '00:00';
+
+    inlineBody.innerHTML = `
+      <div class="statcard">
+        <h4>Punteggio</h4>
+        <div class="big">${score}/${total}</div>
+      </div>
+      <div class="statcard">
+        <h4>Voto (stima)</h4>
+        <div class="big">${grade(score,total)}/10</div>
+        <div style="margin-top:8px;color:rgba(11,29,58,.70);font-size:12px">Scala: % corrette → voto su 10 (arrotondato a 0.5)</div>
+      </div>
+      <div class="statcard">
+        <h4>Tempo</h4>
+        <div class="big">${time}</div>
+      </div>
+      <div class="statcard">
+        <h4>Statistiche per capitolo</h4>
+        ${stats.map(s=>{
+          const accPct = Math.round((s.acc??0)*100);
+          return `<div style="margin-top:10px">
+            <div style="font-weight:850">${esc(s.label)}</div>
+            <div style="color:rgba(11,29,58,.70);font-size:12px">Corrette: ${s.ok} / ${s.done} · ${accPct}%</div>
+            <div class="bar"><div style="width:${accPct}%;"></div></div>
+          </div>`;
+        }).join('') || '<div style="color:rgba(11,29,58,.70);font-size:12px">Nessuna statistica disponibile.</div>'}
+      </div>
+      <div class="advice"><strong>Consiglio:</strong> ${esc(advice)}</div>
+      <div class="statcard">
+        <h4>Correzione (solo sbagliate)</h4>
+        ${wrong.length ? wrong.slice(0,25).map(q=>{
+          const a = answers.get(q.number);
+          return `<div class="statcard" style="margin-top:10px">
+            <h4>Domanda ${q.number}</h4>
+            <div style="font-weight:850;margin-bottom:6px">${esc(q.prompt)}</div>
+            <div style="font-size:13px"><strong>La tua:</strong> ${a.chosen}) ${esc(q[a.chosen])}</div>
+            <div style="font-size:13px;margin-top:4px"><strong>Corretta:</strong> ${q.correct_letter}) ${esc(q.correct_text)}</div>
+            <div style="font-size:12px;color:rgba(11,29,58,.72);margin-top:8px">${esc(q.explanation||'')}</div>
+          </div>`;
+        }).join('') : '<div style="color:rgba(11,29,58,.70);font-size:12px">Nessuna sbagliata 🎉</div>'}
+      </div>
+    `;
+
+    inline.style.display = 'block';
+    inline.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
+  // Hook end button to inline results
+  const endBtn = document.getElementById('endBtn');
+  if (endBtn){
+    endBtn.addEventListener('click', function(){
+      setTimeout(computeInline, 60);
+    }, true);
+  }
+
+  // Also when auto-finish triggers, it calls endBtn.click() -> same hook works.
+})();
+</script>
+
+
+<script>
+(function(){
+  // Route "Lo sapevi che?" to inline panel under the question (no popups)
+  const panel = document.getElementById('inlineTip');
+  const txt = document.getElementById('inlineTipText');
+  const closeBtn = document.getElementById('inlineTipClose');
+  const nextBtn = document.getElementById('inlineTipNext');
+  const hintTop = document.getElementById('hintBtnTop');
+
+  function hide(){
+    if(panel) panel.style.display = 'none';
+  }
+  if (closeBtn) closeBtn.addEventListener('click', hide);
+
+  // Use existing DID_YOU_KNOW/showDidYouKnow if present, otherwise fallback
+  function pick(){
+    try{
+      if (typeof DID_YOU_KNOW !== 'undefined' && DID_YOU_KNOW.length){
+        const p = DID_YOU_KNOW[Math.floor(Math.random()*DID_YOU_KNOW.length)];
+        if (txt && panel){
+          txt.textContent = (p.icon ? (p.icon + " ") : "") + p.text;
+          panel.style.display = 'block';
+          panel.scrollIntoView({behavior:'smooth', block:'nearest'});
+        }
+      }
+    }catch(e){}
+  }
+
+  if (nextBtn) nextBtn.addEventListener('click', pick);
+  if (hintTop) hintTop.addEventListener('click', pick);
+
+  // Auto-hide tip when changing question (if globals exist)
+  try{
+    const oldRender = window.renderQuestion;
+    if (typeof oldRender === 'function'){
+      window.renderQuestion = function(){
+        hide();
+        return oldRender.apply(this, arguments);
+      };
+    }
+  }catch(e){}
 })();
 </script>
 
