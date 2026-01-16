@@ -3,13 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <link rel="manifest" href="./manifest.webmanifest" />
-  <link rel="apple-touch-icon" href="./icon-192.png" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Diritto" />
-  <meta name="theme-color" content="#0b1d3a" />
-  <title>Diritto Quiz — PWA</title>
+  <title>Quiz Diritto — Mobile Premium</title>
   <style>
     :root {
       --bg: #0b1d3a;
@@ -383,6 +377,14 @@
       font-weight: 850;
     }
 
+    
+    /* Toast: evita tagli su iPhone (sopra la barra e con scroll se lungo) */
+    .toast{
+      bottom: calc(90px + env(safe-area-inset-bottom));
+      max-height: 40vh;
+      overflow: auto;
+    }
+
     .toast{
       position: fixed;
       left: 50%;
@@ -412,6 +414,31 @@
     .toast h3{ margin: 0; font-size: 14px; font-weight: 950; }
     .toast p{ margin: 4px 0 0; color: rgba(11,29,58,.78); line-height: 1.35; }
     .toast .tclose{ margin-left:auto; }
+  
+    /* Mobile: barra controlli fissa in basso (più comoda) */
+    @media (max-width: 520px) {
+      .controls {
+        position: sticky;
+        bottom: calc(10px + env(safe-area-inset-bottom));
+        padding: 10px;
+        margin: 0 -6px -6px;
+        border-radius: 16px;
+        background: rgba(255,255,255,.92);
+        border: 1px solid rgba(11,29,58,.10);
+        box-shadow: 0 18px 40px rgba(0,0,0,.18);
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .controls .left, .controls .right {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .controls .left { grid-column: 1 / span 2; }
+      .controls .right { grid-column: 1 / span 2; justify-content: space-between; }
+      .controls .btn { width: 100%; justify-content: center; }
+    }
+
   </style>
 </head>
 <body>
@@ -774,11 +801,8 @@
       if (mode === 'train') showReveal(q, a);
 
       updateStats();
-
-      if (mode === 'train'){
-        setTimeout(() => {
-          if (idx < pool.length - 1){ idx++; renderQuestion(); updateStats(); }
-        }, 420);
+      // Avanzamento: in Allenamento resta fermo (vai avanti tu)
+}, 420);
       }
     }
 
@@ -986,6 +1010,5 @@
     updateMobileUI();
     setMode('train');
   </script>
-<script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));}</script>
 </body>
 </html>
