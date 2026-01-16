@@ -482,6 +482,17 @@
       .prompt { font-size: 18px; }
     }
 
+  
+    /* iOS: riduce “rimbalzo” e scroll della pagina (scroll solo nei pannelli) */
+    html, body { height: 100%; }
+    body { overflow: hidden; }
+    .wrap { height: calc(100vh - 74px); overflow: auto; -webkit-overflow-scrolling: touch; }
+    @media (max-width: 980px) { .wrap { height: 100vh; } }
+
+    /* elementi scrollabili espliciti */
+    .index { -webkit-overflow-scrolling: touch; }
+    .sidebar { -webkit-overflow-scrolling: touch; }
+
   </style>
 </head>
 <body>
@@ -496,6 +507,7 @@
       </div>
     </div>
 
+    <button class="btn" id="hintBtnTop" title="Lo sapevi che?">💡</button>
     <button class="btn primary" id="startBtn">▶ Avvia</button>
   </div>
 
@@ -555,8 +567,7 @@
             <div class="left">
               <button class="btn" id="prevBtn">← Indietro</button>
               <button class="btn" id="nextBtn">Avanti →</button>
-              <button class="btn" id="hintBtn">💡 Lo sapevi che?</button>
-            </div>
+</div>
             <div class="right">
               <button class="btn primary" id="toggleModeBtn" title="Modalità verifica/allenamento">Modalità: Allenamento</button>
               <button class="btn" id="revealBtn" style="display:none">Mostra soluzione</button>
@@ -682,6 +693,7 @@
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
     const hintBtn = document.getElementById('hintBtn');
+    const hintBtnTop = document.getElementById('hintBtnTop');
     const chapterPill = document.getElementById('chapterPill');
     const progressBar = document.getElementById('progressBar');
     const qProgress = document.getElementById('qProgress');
@@ -958,6 +970,7 @@
       if (existing && existing.chosen) return;
 
       const correct = (letter === q.correct_letter);
+      try{ if(navigator.vibrate) navigator.vibrate(correct ? 15 : [20,30,20]); }catch(e){}
       answers.set(q.number, { chosen: letter, correct });
 
       const a = answers.get(q.number);
@@ -1169,7 +1182,7 @@
     prevBtn.onclick = () => { if (idx > 0) { idx--; renderQuestion(); updateStats(); saveState(); } };
     nextBtn.onclick = () => { if (idx < pool.length - 1) { idx++; renderQuestion(); updateStats(); saveState(); } };
 
-    hintBtn.onclick = showDidYouKnow;
+    if (hintBtnTop) hintBtnTop.onclick = showDidYouKnow;
     toastClose.onclick = () => toast.classList.remove('show');
 
     toggleModeBtn.onclick = () => setMode(mode === 'train' ? 'exam' : 'train');
@@ -1239,4 +1252,106 @@
     setInterval(saveState, 2000);
 
   </script>
+
+  <!-- Pause overlay (iOS-friendly) -->
+  <div class="overlay" id="pauseOverlay" style="display:none; z-index:90;">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="mhead">
+        <h2>⏸ In pausa</h2>
+        <button class="btn" id="pauseCloseBtn">Riprendi</button>
+      </div>
+      <div class="mbody">
+        <div class="statcard">
+          <h4>Timer</h4>
+          <div class="big" id="pauseTimer">00:00</div>
+          <div style="margin-top:8px;color:rgba(11,29,58,.70);font-size:12px" id="pauseNote">
+            Il timer è stato aggiornato automaticamente.
+          </div>
+        </div>
+        <div class="advice">
+          <strong>Tip:</strong> se vuoi una verifica “seria”, usa la modalità Verifica: le soluzioni le vedi solo alla fine.
+        </div>
+        <button class="btn primary" id="pauseResumeBtn" style="width:100%; justify-content:center;">▶ Riprendi</button>
+      </div>
+    </div>
+  </div>
+
+
+<script>
+(function(){
+  // ---- iOS overscroll guard ----
+  // Allow scrolling only inside elements that can scroll.
+  const allowScrollSelectors = ['.index', '#sidebar', '.wrap', '.toast', '.modal .mbody'];
+  function isScrollable(el){
+    if(!el) return false;
+    const style = window.getComputedStyle(el);
+    const overflowY = style.overflowY;
+    return (overflowY === 'auto' || overflowY === 'scroll') && (el.scrollHeight > el.clientHeight + 1);
+  }
+  document.addEventListener('touchmove', function(e){
+    let node = e.target;
+    while(node && node !== document.body){
+      if (allowScrollSelectors.some(sel => node.matches && node.matches(sel))) {
+        // If it's scrollable, allow. If not scrollable, continue climbing.
+        if (isScrollable(node)) return;
+      }
+      node = node.parentElement;
+    }
+    // Block page rubber-band
+    e.preventDefault();
+  }, {passive:false});
+
+  // ---- Pause overlay + timer catch-up on app background ----
+  const pauseOverlay = document.getElementById('pauseOverlay');
+  const pauseTimer = document.getElementById('pauseTimer');
+  const pauseResumeBtn = document.getElementById('pauseResumeBtn');
+  const pauseCloseBtn = document.getElementById('pauseCloseBtn');
+
+  // These globals exist in the app code (v5+): started, startEpoch, elapsedMs, timerText, saveState()
+  let hiddenAt = null;
+
+  function showPause(){
+    if(!pauseOverlay) return;
+    pauseTimer.textContent = (window.timerText && window.timerText.textContent) ? window.timerText.textContent : '00:00';
+    pauseOverlay.style.display = 'flex';
+    pauseOverlay.classList.add('show');
+  }
+  function hidePause(){
+    if(!pauseOverlay) return;
+    pauseOverlay.classList.remove('show');
+    pauseOverlay.style.display = 'none';
+  }
+
+  function safeCallSave(){
+    try{ if (typeof saveState === 'function') saveState(); }catch(e){}
+  }
+
+  document.addEventListener('visibilitychange', function(){
+    try{
+      if (document.hidden){
+        // record time when hidden
+        hiddenAt = Date.now();
+        safeCallSave();
+      } else {
+        // back to foreground: if timer was running, add the hidden delta
+        if (hiddenAt && typeof started !== 'undefined' && started && typeof startEpoch !== 'undefined'){
+          const delta = Date.now() - hiddenAt;
+          // elapsedMs + delta, keep timer continuous even if JS was paused
+          if (typeof elapsedMs !== 'undefined') elapsedMs = (elapsedMs || 0) + delta;
+          if (typeof startEpoch !== 'undefined') startEpoch = Date.now() - (elapsedMs || 0);
+          if (window.timerText) window.timerText.textContent = (typeof fmtTime === 'function') ? fmtTime(elapsedMs||0) : window.timerText.textContent;
+          showPause();
+          safeCallSave();
+        }
+        hiddenAt = null;
+      }
+    }catch(e){}
+  });
+
+  if (pauseResumeBtn) pauseResumeBtn.addEventListener('click', hidePause);
+  if (pauseCloseBtn) pauseCloseBtn.addEventListener('click', hidePause);
+  if (pauseOverlay) pauseOverlay.addEventListener('click', (e)=>{ if(e.target === pauseOverlay) hidePause(); });
+})();
+</script>
+
 </body></html>
