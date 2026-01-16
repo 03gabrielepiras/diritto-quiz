@@ -484,14 +484,19 @@
 
   
     /* iOS: riduce “rimbalzo” e scroll della pagina (scroll solo nei pannelli) */
+    
+    /* iOS: evita rimbalzi “troppo” aggressivi ma non blocca la UI */
     html, body { height: 100%; }
-    body { overflow: hidden; }
-    .wrap { height: calc(100vh - 74px); overflow: auto; -webkit-overflow-scrolling: touch; }
-    @media (max-width: 980px) { .wrap { height: 100vh; } }
-
-    /* elementi scrollabili espliciti */
+    body { overflow-x: hidden; }
+    .index, .sidebar, .wrap { -webkit-overflow-scrolling: touch; }
+              /* elementi scrollabili espliciti */
     .index { -webkit-overflow-scrolling: touch; }
     .sidebar { -webkit-overflow-scrolling: touch; }
+
+  
+    @media (max-width: 520px) {
+      .controls .btn { min-height: 44px; font-size: 14px; }
+    }
 
   </style>
 </head>
@@ -1288,19 +1293,6 @@
     const overflowY = style.overflowY;
     return (overflowY === 'auto' || overflowY === 'scroll') && (el.scrollHeight > el.clientHeight + 1);
   }
-  document.addEventListener('touchmove', function(e){
-    let node = e.target;
-    while(node && node !== document.body){
-      if (allowScrollSelectors.some(sel => node.matches && node.matches(sel))) {
-        // If it's scrollable, allow. If not scrollable, continue climbing.
-        if (isScrollable(node)) return;
-      }
-      node = node.parentElement;
-    }
-    // Block page rubber-band
-    e.preventDefault();
-  }, {passive:false});
-
   // ---- Pause overlay + timer catch-up on app background ----
   const pauseOverlay = document.getElementById('pauseOverlay');
   const pauseTimer = document.getElementById('pauseTimer');
