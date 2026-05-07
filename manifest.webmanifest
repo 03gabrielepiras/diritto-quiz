@@ -1,10 +1,11 @@
 {
-  "name": "Diritto Quiz",
-  "short_name": "Diritto",
+  "name": "Gestione Patrimonio",
+  "short_name": "Patrimonio",
+  "description": "Il tuo piano FIRE personale: patrimonio, simulatore, news e consigli finanziari",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#0b1d3a",
-  "theme_color": "#0b1d3a",
+  "background_color": "#0d3b6e",
+  "theme_color": "#0d3b6e",
   "icons": [
     {
       "src": "./icon-192.png",
