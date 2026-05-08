@@ -374,6 +374,19 @@ table.proj tr.fire-row td{background:var(--success2);color:var(--success);font-w
 .upload-sub{font-size:12px;color:var(--t3);margin-top:4px}
 .img-prev{width:100%;border-radius:var(--rsm);margin-top:10px}
 
+/* ── PENDING ACTIONS ── */
+#pending-actions{
+  padding:12px 14px;border-top:1px solid var(--border);
+  background:rgba(245,158,11,.06);
+}
+.action-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.action-row:last-child{margin-bottom:0}
+@keyframes dotBlink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+.typing-dot{display:inline-block;width:7px;height:7px;border-radius:50%;
+  background:var(--t2);margin:0 2px;animation:dotBlink 1.4s ease-in-out infinite}
+.typing-dot:nth-child(2){animation-delay:.2s}
+.typing-dot:nth-child(3){animation-delay:.4s}
+
 /* ── HIDDEN ── */
 .hidden{display:none!important}
 
@@ -682,65 +695,63 @@ table.proj tr.fire-row td{background:var(--success2);color:var(--success);font-w
 
 <!-- ══════════════════════════════════ AI ══ -->
 <div class="section" id="tab-ai">
-  <div class="sec-title">API Key Anthropic</div>
-  <div class="card">
-    <div class="row2" style="align-items:flex-end">
-      <div style="grid-column:1/-1">
-        <label class="field-label">Chiave API (sk-ant-...)</label>
-        <input type="password" id="api-key-input" placeholder="sk-ant-api03-...">
-      </div>
+
+  <!-- API Key compatta -->
+  <div class="card" style="padding:12px 14px">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <input type="password" id="api-key-input" placeholder="sk-ant-api03-..." style="flex:1;min-width:150px;margin:0;font-size:13px;padding:9px 12px">
+      <button class="btn btn-primary btn-sm" onclick="saveApiKey()" style="flex-shrink:0">Salva</button>
+      <div id="api-key-status"></div>
     </div>
-    <button class="btn btn-primary btn-sm mt8" onclick="saveApiKey()">Salva chiave</button>
-    <div id="api-key-status" class="mt8"></div>
-    <div class="fs11 t3 mt4">La chiave viene salvata solo sul tuo dispositivo. Ottienila su <strong style="color:var(--primary2)">console.anthropic.com</strong> &rarr; API Keys. Nota: l'abbonamento Claude consumer NON include l'accesso API.</div>
+    <div class="fs11 t3 mt4">Chiave da <strong style="color:var(--primary2)">console.anthropic.com</strong> &rarr; API Keys &nbsp;&middot;&nbsp; NON &egrave; l'abbonamento Claude</div>
   </div>
 
-  <div class="sec-title">Carica Screenshot Revolut</div>
-  <div class="card">
-    <div class="upload-zone" onclick="document.getElementById('img-upload').click()" id="upload-drop">
-      <div class="upload-ico">📷</div>
-      <div class="upload-text">Carica screenshot Revolut</div>
-      <div class="upload-sub">Claude legge i valori e aggiorna il portafoglio automaticamente</div>
-      <input type="file" id="img-upload" accept="image/*" onchange="onImageUpload(event)">
-    </div>
-    <img id="img-preview" class="img-prev hidden" alt="anteprima">
-    <div id="img-analyze-area" class="hidden mt8" style="display:flex;gap:8px">
-      <button class="btn btn-success btn-sm" onclick="analyzeImage()">Analizza e aggiorna portafoglio</button>
-      <button class="btn btn-ghost btn-sm" onclick="clearImage()">Rimuovi</button>
-    </div>
+  <div class="alert alert-info fs12">
+    <strong>Come funziona:</strong> scrivi cosa &egrave; successo ("Ho ricevuto stipendio", "Ho comprato 2 quote VUAA a €118") oppure carica uno screenshot Revolut con 📷. L'agente legge, risponde e propone gli aggiornamenti al portafoglio.
   </div>
 
-  <div class="sec-title">Chat AI finanziario</div>
+  <!-- Chat agente -->
   <div class="chat-wrap">
     <div class="chat-msgs" id="chat-box">
-      <div class="msg ai">Ciao! Sono il tuo AI finanziario. Conosco il tuo profilo: 22 anni, VUAA su Revolut, debito €9.500, piano FIRE a 39 anni. Inserisci la tua API key Anthropic sopra e poi chiedimi qualsiasi cosa &mdash; analisi news, consigli sul portafoglio, quando diversificare, come gestire il debito.</div>
+      <div class="msg ai">Ciao! Sono il tuo agente finanziario AI. Dimmi cosa &egrave; successo &mdash; un pagamento ricevuto, un acquisto di ETF, una variazione di saldo &mdash; e aggiorno il portafoglio automaticamente. Puoi anche allegare uno screenshot Revolut con 📷.</div>
     </div>
+    <!-- Area azioni suggerite da AI -->
+    <div id="pending-actions" class="hidden"></div>
     <div class="chat-input-area">
-      <textarea id="chat-input" placeholder="Chiedi... es. 'Devo vendere EMBC?' o 'Come impatta la Fed su VUAA?'" onkeydown="onChatKey(event)"></textarea>
+      <label style="cursor:pointer;font-size:22px;color:var(--t2);flex-shrink:0;padding:4px 0;line-height:1" title="Allega screenshot">
+        📷<input type="file" id="img-upload" accept="image/*" onchange="onImageUpload(event)" style="display:none">
+      </label>
+      <textarea id="chat-input" placeholder="es. 'Stipendio arrivato €2300', 'Comprato VUAA €150', 'Vedi screenshot'" onkeydown="onChatKey(event)"></textarea>
       <button class="btn btn-primary btn-sm" onclick="sendChat()">Invia</button>
     </div>
   </div>
-  <div class="fs11 t3 mt4">Il tuo portafoglio viene inviato automaticamente. Ctrl+Enter per inviare.</div>
+
+  <!-- Anteprima immagine allegata -->
+  <div id="img-preview-area" class="card hidden" style="padding:10px;margin-top:-6px">
+    <img id="img-preview" style="width:100%;border-radius:8px;margin-bottom:8px;max-height:180px;object-fit:contain" alt="screenshot">
+    <button class="btn btn-ghost btn-xs" onclick="clearImage()" style="font-size:11px">✕ Rimuovi immagine</button>
+  </div>
+
+  <div class="fs11 t3 mt4" style="margin-bottom:12px">Il tuo portafoglio aggiornato viene inviato ad ogni messaggio. Ctrl+Enter per inviare.</div>
 
   <div class="sec-title">Consigli personalizzati</div>
-
   <div class="card">
     <div class="fw7 mb0" style="font-size:15px;color:var(--primary2);margin-bottom:10px">Cosa fare adesso</div>
     <div class="alert alert-info fs12 mb0">Stipendio il 10. Il 12 escono VUAA €150 + Robo €10. Paga €250 extra sul prestito questo mese.</div>
     <div class="sep"></div>
-    <p style="font-size:14px;color:var(--t2);line-height:1.7;margin:0"><span class="step-num">1</span><strong style="color:var(--t1)">Non toccare VUAA.</strong> Se il mercato scende del 30% stai comprando piu quote allo stesso prezzo.<br>
-    <span class="step-num" style="margin-top:8px;display:inline-flex">2</span><strong style="color:var(--t1)">Paga il debito aggressivamente.</strong> Da giugno porta il pagamento extra a €600/mese.<br>
-    <span class="step-num" style="margin-top:8px;display:inline-flex">3</span><strong style="color:var(--t1)">Non aumentare le spese</strong> quando lo stipendio cresce. Investi la differenza tutta.</p>
+    <p style="font-size:14px;color:var(--t2);line-height:1.7;margin:0">
+      <span class="step-num">1</span><strong style="color:var(--t1)">Non toccare VUAA.</strong> Se il mercato scende del 30% stai comprando piu quote allo stesso prezzo.<br>
+      <span class="step-num" style="margin-top:8px;display:inline-flex">2</span><strong style="color:var(--t1)">Paga il debito aggressivamente.</strong> Da giugno porta il pagamento extra a €600/mese.<br>
+      <span class="step-num" style="margin-top:8px;display:inline-flex">3</span><strong style="color:var(--t1)">Non aumentare le spese</strong> quando lo stipendio cresce. Investi la differenza tutta.
+    </p>
   </div>
-
   <div class="card">
     <div class="fw7" style="font-size:15px;color:var(--primary2);margin-bottom:8px">VUAA vs Diversificazione</div>
-    <p class="fs13 t2" style="margin:0;line-height:1.7">Tieni 100% VUAA per i primi 3-5 anni. Quando superi €10-15k di portafoglio, aggiungi 20% VWCE per esposizione globale. <strong style="color:var(--t1)">EMBC:</strong> liquidala quando recupera, reinvesti in VUAA. Ribilancia una volta l'anno &mdash; non in base alle news di breve periodo.</p>
+    <p class="fs13 t2" style="margin:0;line-height:1.7">Tieni 100% VUAA per i primi 3-5 anni. Quando superi €10-15k di portafoglio, aggiungi 20% VWCE per esposizione globale. <strong style="color:var(--t1)">EMBC:</strong> liquidala quando recupera, reinvesti in VUAA.</p>
   </div>
-
   <div class="card">
     <div class="fw7" style="font-size:15px;color:var(--primary2);margin-bottom:8px">Fondo Emergenza vero</div>
-    <p class="fs13 t2" style="margin:0;line-height:1.7">Il Robo-Advisor Rischio 5/5 NON e un fondo emergenza. Costruisci €3-5k su un <strong style="color:var(--t1)">conto deposito svincolato</strong> (Illimity, Banca Progetto) al 2-3%. Solo dopo parti col Full Invest a €1.200/mese.</p>
+    <p class="fs13 t2" style="margin:0;line-height:1.7">Il Robo-Advisor Rischio 5/5 NON &egrave; un fondo emergenza. Costruisci €3-5k su un <strong style="color:var(--t1)">conto deposito svincolato</strong> (Illimity, Banca Progetto) al 2-3%.</p>
   </div>
   <div style="height:8px"></div>
 </div>
@@ -1100,19 +1111,23 @@ function cancelEventForm(){document.getElementById('event-form').classList.add('
 
 // ── MARKET DATA ────────────────────────────────────────────────────────────
 const PROXIES=[
+  u=>'https://api.codetabs.com/v1/proxy?quest='+encodeURIComponent(u),
   u=>'https://corsproxy.io/?'+encodeURIComponent(u),
-  u=>'https://api.allorigins.win/raw?url='+encodeURIComponent(u),
   u=>'https://api.allorigins.win/get?url='+encodeURIComponent(u),
+  u=>'https://thingproxy.freeboard.io/fetch/'+u,
 ];
 async function fetchProxy(url,attempt=0){
   if(attempt>=PROXIES.length)return null;
   try{
-    const r=await fetch(PROXIES[attempt](url),{signal:AbortSignal.timeout(7000)});
+    const r=await fetch(PROXIES[attempt](url),{signal:AbortSignal.timeout(9000)});
     if(!r.ok)return fetchProxy(url,attempt+1);
     const text=await r.text();
-    if(!text||text.startsWith('<'))return fetchProxy(url,attempt+1);
-    const p=JSON.parse(text);
-    return p.contents?JSON.parse(p.contents):p;
+    if(!text||text.length<10)return fetchProxy(url,attempt+1);
+    try{
+      const p=JSON.parse(text);
+      if(p.contents!==undefined){try{return JSON.parse(p.contents);}catch{return fetchProxy(url,attempt+1);}}
+      return p;
+    }catch{return fetchProxy(url,attempt+1);}
   }catch{return fetchProxy(url,attempt+1);}
 }
 async function fetchYahoo(sym){
@@ -1159,8 +1174,10 @@ async function loadPrices(force=false){
 }
 
 // ── NEWS ───────────────────────────────────────────────────────────────────
-const RSS={ansa:'https://www.ansa.it/sito/notizie/economia/economia_rss.xml',
-           sole:'https://www.ilsole24ore.com/rss/finanza--e-mercati.xml'};
+const RSS={
+  ansa:'https://www.ansa.it/sito/notizie/economia/economia_rss.xml',
+  sole:'https://www.ilsole24ore.com/rss/finanza--e-mercati.xml'
+};
 const VUAA_KW=['s&p','sp500','wall street','nasdaq','fed ','federal reserve','usa ','stati uniti','borsa','inflazione','recessione','etf '];
 let curSrc='ansa';
 async function loadNews(src){
@@ -1172,19 +1189,18 @@ async function loadNews(src){
   const loader=document.getElementById('news-loader'),list=document.getElementById('news-list');
   loader.style.display='block';list.innerHTML='';
   try{
-    const data=await fetchProxy(RSS[curSrc]);
-    let xmlText;
-    if(!data)throw new Error('no data');
-    xmlText=typeof data==='string'?data:data.contents||JSON.stringify(data);
-    const xml=new DOMParser().parseFromString(xmlText,'text/xml');
-    const items=Array.from(xml.querySelectorAll('item')).slice(0,20);
+    // rss2json converte RSS XML in JSON direttamente - nessun problema CORS
+    const apiUrl='https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(RSS[curSrc])+'&count=20';
+    const r=await fetch(apiUrl,{signal:AbortSignal.timeout(12000)});
+    if(!r.ok)throw new Error('rss2json error '+r.status);
+    const data=await r.json();
+    if(data.status!=='ok'||!data.items?.length)throw new Error('no items');
     loader.style.display='none';
-    if(!items.length){list.innerHTML='<div class="t3 fs13" style="padding:14px">Nessuna notizia. Prova l\'altra fonte.</div>';return;}
-    list.innerHTML=items.map(item=>{
-      const title=item.querySelector('title')?.textContent||'';
-      const link=item.querySelector('link')?.textContent||'#';
-      const date=item.querySelector('pubDate')?.textContent||'';
-      const desc=(item.querySelector('description')?.textContent||'').replace(/<[^>]+>/g,'').trim().slice(0,120);
+    list.innerHTML=data.items.map(item=>{
+      const title=item.title||'';
+      const link=item.link||'#';
+      const date=item.pubDate||'';
+      const desc=(item.description||'').replace(/<[^>]+>/g,'').trim().slice(0,120);
       const isVuaa=VUAA_KW.some(k=>title.toLowerCase().includes(k));
       const ds=date?new Date(date).toLocaleString('it-IT',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'';
       return '<div class="news-item">'
@@ -1196,7 +1212,7 @@ async function loadNews(src){
     document.getElementById('news-ts').textContent='Aggiornato '+new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
   }catch{
     loader.style.display='none';
-    list.innerHTML='<div class="alert alert-warn fs12">Impossibile caricare le notizie. '
+    list.innerHTML='<div class="alert alert-warn fs12">Notizie non disponibili. '
       +'<a href="https://www.ansa.it/economia/" target="_blank" style="color:var(--primary2)">Apri ANSA</a> &nbsp; '
       +'<a href="https://www.ilsole24ore.com/finanza-e-mercati" target="_blank" style="color:var(--primary2)">Il Sole 24 Ore</a></div>';
   }
@@ -1206,136 +1222,181 @@ async function loadNews(src){
 function saveApiKey(){
   const k=document.getElementById('api-key-input').value.trim();
   if(!k.startsWith('sk-ant-')){alert('La chiave deve iniziare con sk-ant-');return;}
-  setApiKey(k);renderApiKeyStatus();alert('Chiave salvata!');
+  setApiKey(k);renderApiKeyStatus();
 }
 function renderApiKeyStatus(){
   const k=getApiKey();
   const el=document.getElementById('api-key-status');if(!el)return;
-  el.innerHTML=k?'<span class="badge badge-success">Chiave attiva: '+k.slice(0,18)+'...</span>'
-    :'<span class="badge badge-warn">Nessuna chiave configurata</span>';
+  el.innerHTML=k?'<span class="badge badge-success">✓ Attiva</span>'
+    :'<span class="badge badge-warn">Nessuna chiave</span>';
   const inp=document.getElementById('api-key-input');
-  if(inp&&k)inp.placeholder='(chiave salvata, riscrivi per aggiornare)';
+  if(inp&&k)inp.placeholder='(chiave salvata)';
 }
 
-// ── CLAUDE CHAT ────────────────────────────────────────────────────────────
+// ── CLAUDE AGENT ────────────────────────────────────────────────────────────
 function buildSystem(){
   const{assets,actives,debts,net}=computeTotals();
-  return`Sei il consulente finanziario AI personale di questo utente italiano. Rispondi SEMPRE in italiano in modo diretto, specifico e numerico.
+  return`Sei l'agente finanziario AI personale di questo utente italiano di 22 anni. Rispondi SEMPRE in italiano, in modo diretto e pratico.
 
 PROFILO: 22 anni, €2.300/mese netto, spese €1.700 ora (da giugno €490 fissi), profilo rischio molto aggressivo, obiettivo FIRE entro 39 anni.
 
-PORTAFOGLIO ATTUALE:
-${assets.map(a=>`- ${a.name} (${a.cat}): €${fmtN(a.val)}${a.ticker?' ['+a.ticker+']':''}`).join('\n')}
+PORTAFOGLIO ATTUALE (ID→nome→valore):
+${assets.map(a=>`  ID${a.id} ${a.name} (${a.cat}): €${fmtN(a.val)}${a.ticker?' ['+a.ticker+']':''}`).join('\n')}
 Attivi: €${fmtN(actives)} | Debiti: €${fmtN(debts)} | Netto: €${fmtN(net)}
 
 PIANO:
-- Ora: VUAA €150/mese, extra debito €250/mese
-- Da giugno: VUAA €600/mese, extra debito €600/mese, debito estinto feb 2027
+- Ora: VUAA €150/mese il 12, extra debito €250/mese
+- Da giugno: VUAA €600/mese, extra debito €600/mese → debito zero feb 2027
 - Da mar 2027: €1.200+/mese (80% VUAA + 20% VWCE)
-- FIRE number: €550.000 (4% rule)
+- FIRE number: €550.000 (4% rule → €22k/anno passivi)
 
-REGOLE: Sii specifico e pratico. Dai sempre una risposta concreta con numeri reali. Non dire mai "consulta un professionista" senza prima dare una risposta utile.`;
+REGOLA AZIONI: Quando l'utente descrive un evento finanziario reale (stipendio ricevuto, acquisto ETF, variazione saldo, dati da screenshot), PRIMA rispondi in italiano, POI includi un blocco JSON con le azioni:
+
+[AZIONI]
+[{"assetId":ID,"newVal":VALORE_EUR_ASSOLUTO,"label":"descrizione breve"}]
+[/AZIONI]
+
+Usa "newVal" = nuovo valore ASSOLUTO (non il delta). Includi solo se sei certo. Se nessun aggiornamento serve, ometti il blocco completamente.`;
 }
+
 let chatHist=[];
-function addMsg(role,text,loading=false){
+let pendingImageB64=null,pendingImageMime=null;
+
+function addMsg(role,text){
   const box=document.getElementById('chat-box');
   const d=document.createElement('div');
-  d.className='msg '+role+(loading?' loading':'');
+  d.className='msg '+role;
   d.textContent=text;
   box.appendChild(d);box.scrollTop=box.scrollHeight;
   return d;
 }
+function addMsgLoading(){
+  const box=document.getElementById('chat-box');
+  const d=document.createElement('div');
+  d.className='msg ai';
+  d.innerHTML='<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
+  box.appendChild(d);box.scrollTop=box.scrollHeight;
+  return d;
+}
+
+function parseAgentActions(text){
+  const m=text.match(/\[AZIONI\]([\s\S]*?)\[\/AZIONI\]/);
+  if(!m)return null;
+  try{return JSON.parse(m[1].trim());}catch{return null;}
+}
+function cleanAgentText(text){
+  return text.replace(/\[AZIONI\][\s\S]*?\[\/AZIONI\]/g,'').trim();
+}
+
+let _pendingActionsData=[];
+function showPendingActions(actions){
+  const el=document.getElementById('pending-actions');
+  if(!el||!actions?.length){if(el)el.classList.add('hidden');return;}
+  _pendingActionsData=[...actions];
+  el.classList.remove('hidden');
+  renderPendingActions();
+}
+function renderPendingActions(){
+  const el=document.getElementById('pending-actions');if(!el)return;
+  if(!_pendingActionsData.length){el.classList.add('hidden');return;}
+  el.innerHTML='<div style="font-size:11px;font-weight:800;color:var(--warn);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">⚡ Aggiornamenti suggeriti</div>'
+    +_pendingActionsData.map((a,i)=>{
+      const asset=getAssets().find(x=>x.id===a.assetId);
+      if(!asset)return '';
+      return '<div class="action-row">'
+        +'<span class="badge badge-warn" style="flex:1;min-width:0">'+asset.name+': '+fmtN(asset.val)+' → '+fmtN(a.newVal)+'</span>'
+        +(a.label?'<span class="fs11 t3" style="flex-shrink:0">'+a.label+'</span>':'')
+        +'<button class="btn btn-success btn-xs" onclick="applyOneAction('+i+')">Applica</button>'
+        +'<button class="btn btn-ghost btn-xs" onclick="dismissAction('+i+')">✕</button></div>';
+    }).join('')
+    +(_pendingActionsData.length>1
+      ?'<button class="btn btn-primary btn-sm btn-full mt8" onclick="applyAllActions()">Applica tutte</button>':'');
+}
+function applyOneAction(i){
+  const a=_pendingActionsData[i];if(!a)return;
+  const assets=getAssets();
+  const asset=assets.find(x=>x.id===a.assetId);
+  if(!asset){addMsg('ai','Asset non trovato nel portafoglio.');return;}
+  const oldVal=asset.val;
+  asset.val=parseFloat((+a.newVal).toFixed(2));
+  setAssets(assets);renderAssets();
+  addMsg('ai','✅ '+asset.name+' aggiornato: €'+fmtN(oldVal)+' → €'+fmtN(asset.val));
+  _pendingActionsData.splice(i,1);
+  renderPendingActions();
+}
+function dismissAction(i){_pendingActionsData.splice(i,1);renderPendingActions();}
+function applyAllActions(){
+  while(_pendingActionsData.length)applyOneAction(0);
+}
+
 async function sendChat(){
   const inp=document.getElementById('chat-input');
-  const text=inp.value.trim();if(!text)return;
+  const text=inp.value.trim();
+  if(!text&&!pendingImageB64)return;
   const key=getApiKey();
-  if(!key){alert('Inserisci prima la tua API key nella sezione sopra.');return;}
-  addMsg('user',text);chatHist.push({role:'user',content:text});inp.value='';
-  const loadEl=addMsg('ai','Sto analizzando...',true);
+  if(!key){alert('Inserisci prima la tua API key nella sezione in alto.');return;}
+
+  let userContent,userLabel;
+  if(pendingImageB64){
+    userContent=[
+      {type:'image',source:{type:'base64',media_type:pendingImageMime,data:pendingImageB64}},
+      {type:'text',text:text||'Analizza questo screenshot Revolut. Descrivi cosa vedi e aggiorna il portafoglio con le voci trovate.'}
+    ];
+    userLabel='📷 '+(text||'Screenshot Revolut allegato');
+    clearImage();
+  }else{
+    userContent=text;
+    userLabel=text;
+  }
+  addMsg('user',userLabel);
+  chatHist.push({role:'user',content:userContent});
+  inp.value='';
+  const loadEl=addMsgLoading();
   try{
     const resp=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':key,
         'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:1024,
+      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:1200,
         system:buildSystem(),messages:chatHist}),
     });
     const data=await resp.json();
     if(!resp.ok)throw new Error(data.error?.message||'Errore API');
-    const reply=data.content[0].text;
-    loadEl.textContent=reply;loadEl.classList.remove('loading');
-    chatHist.push({role:'assistant',content:reply});
+    const fullReply=data.content[0].text;
+    const cleanReply=cleanAgentText(fullReply);
+    const actions=parseAgentActions(fullReply);
+    loadEl.remove();
+    addMsg('ai',cleanReply);
+    chatHist.push({role:'assistant',content:fullReply});
     if(chatHist.length>20)chatHist=chatHist.slice(-20);
+    if(actions?.length)showPendingActions(actions);
   }catch(e){
-    loadEl.textContent='Errore: '+(e.message||'controlla la chiave API.');
-    loadEl.classList.remove('loading');chatHist.pop();
+    loadEl.remove();
+    addMsg('ai','Errore: '+(e.message||'controlla la chiave API.'));
+    chatHist.pop();
   }
 }
 function onChatKey(e){if(e.key==='Enter'&&(e.ctrlKey||e.metaKey))sendChat();}
 
 // ── IMAGE UPLOAD ───────────────────────────────────────────────────────────
-let uploadedImg=null;
 function onImageUpload(e){
   const file=e.target.files[0];if(!file)return;
   const reader=new FileReader();
   reader.onload=ev=>{
-    uploadedImg=ev.target.result;
+    const dataUrl=ev.target.result;
+    pendingImageB64=dataUrl.split(',')[1];
+    pendingImageMime=file.type||'image/jpeg';
     const prev=document.getElementById('img-preview');
-    prev.src=uploadedImg;prev.classList.remove('hidden');
-    document.getElementById('img-analyze-area').style.display='flex';
-    document.getElementById('upload-drop').style.display='none';
+    const area=document.getElementById('img-preview-area');
+    prev.src=dataUrl;
+    area.classList.remove('hidden');
   };
   reader.readAsDataURL(file);
 }
 function clearImage(){
-  uploadedImg=null;
-  document.getElementById('img-preview').classList.add('hidden');
-  document.getElementById('img-analyze-area').style.display='none';
-  document.getElementById('upload-drop').style.display='';
+  pendingImageB64=null;pendingImageMime=null;
+  document.getElementById('img-preview-area').classList.add('hidden');
   document.getElementById('img-upload').value='';
-}
-async function analyzeImage(){
-  const key=getApiKey();
-  if(!key){alert('Inserisci prima la API key Anthropic.');return;}
-  if(!uploadedImg)return;
-  const btn=document.querySelector('#img-analyze-area button');
-  btn.textContent='Analisi in corso...';btn.disabled=true;
-  const base64=uploadedImg.split(',')[1];
-  const mime=uploadedImg.split(';')[0].split(':')[1];
-  try{
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':key,
-        'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:1024,messages:[{role:'user',content:[
-        {type:'image',source:{type:'base64',media_type:mime,data:base64}},
-        {type:'text',text:`Analizza questo screenshot di Revolut. Restituisci SOLO un JSON array con gli asset trovati.
-Formato: [{"name":"nome","value":123.45,"ticker":"TICKER"}]
-- Vanguard S&P 500 → ticker VUAA.MI
-- Embecta → ticker EMBC
-- Valori in EUR (converti se necessario)
-- Includi: ETF, azioni, saldo conto, crypto
-- Escludi: transazioni, storico movimenti
-Rispondi SOLO con il JSON, zero testo aggiuntivo.`}
-      ]}]}),
-    });
-    const data=await resp.json();
-    if(!resp.ok)throw new Error(data.error?.message||'Errore');
-    const text=data.content[0].text.trim();
-    let parsed;try{parsed=JSON.parse(text);}catch{throw new Error('Risposta non valida: '+text.slice(0,80));}
-    if(!Array.isArray(parsed)||!parsed.length)throw new Error('Nessun asset trovato.');
-    const msg='AI ha trovato:\n\n'+parsed.map(x=>`• ${x.name}: €${fmtN(x.value||0)}`).join('\n')+'\n\nAggiornare il portafoglio?';
-    if(!confirm(msg)){btn.textContent='Analizza e aggiorna portafoglio';btn.disabled=false;return;}
-    const assets=getAssets();
-    parsed.forEach(ext=>{
-      let a=assets.find(x=>x.ticker&&ext.ticker&&x.ticker.toLowerCase()===ext.ticker.toLowerCase());
-      if(!a)a=assets.find(x=>x.name.toLowerCase().includes((ext.name||'').toLowerCase().slice(0,5)));
-      if(a)a.val=parseFloat((ext.value||0).toFixed(2));
-      else assets.push({id:Math.max(0,...assets.map(a=>a.id))+1,name:ext.name,cat:'etf',val:parseFloat((ext.value||0).toFixed(2)),ticker:ext.ticker||''});
-    });
-    setAssets(assets);renderAssets();alert('Portafoglio aggiornato!');clearImage();
-  }catch(e){alert('Errore analisi: '+e.message);}
-  finally{btn.textContent='Analizza e aggiorna portafoglio';btn.disabled=false;}
 }
 
 // ── AUTO REFRESH ───────────────────────────────────────────────────────────
