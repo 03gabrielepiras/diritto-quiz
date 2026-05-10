@@ -1,0 +1,1490 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Patrimonio</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#08081a">
+<style>
+:root{
+  --bg:#08081a; --s1:#10102a; --s2:#181838; --s3:#1e1e44;
+  --border:rgba(255,255,255,.07); --border2:rgba(255,255,255,.13);
+  --primary:#7c6dfa; --primary2:#9d8ff8; --primary3:rgba(124,109,250,.15);
+  --success:#00d4aa; --success2:rgba(0,212,170,.15);
+  --warn:#f59e0b; --warn2:rgba(245,158,11,.15);
+  --danger:#ff4f6d; --danger2:rgba(255,79,109,.15);
+  --gold:#fbbf24;
+  --t1:#eef0f8; --t2:#8b9cc8; --t3:#4a5578;
+  --r:18px; --rsm:10px; --rxl:26px;
+  --sh:0 8px 32px rgba(0,0,0,.5);
+  --sh2:0 2px 12px rgba(0,0,0,.3);
+  --nav-h:72px;
+}
+*,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  margin:0;padding:0;background:var(--bg);color:var(--t1);
+  min-height:100vh;padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom));
+  overflow-x:hidden}
+::selection{background:var(--primary);color:#fff}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--s3);border-radius:2px}
+
+/* ── SECTIONS ── */
+.section{display:none;padding:16px 16px 8px;max-width:600px;margin:0 auto;animation:fadeUp .3s ease}
+.section.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;
+  background:rgba(10,10,26,.85);
+  backdrop-filter:blur(20px) saturate(180%);
+  -webkit-backdrop-filter:blur(20px) saturate(180%);
+  border-top:1px solid var(--border);
+  display:flex;align-items:stretch;
+  height:var(--nav-h);
+  padding-bottom:env(safe-area-inset-bottom);
+  z-index:100;
+}
+.nav-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:4px;background:none;border:none;cursor:pointer;
+  color:var(--t3);transition:color .2s;padding:8px 4px;
+  font-size:10px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;
+}
+.nav-btn .ico{font-size:22px;transition:transform .2s}
+.nav-btn.active{color:var(--primary)}
+.nav-btn.active .ico{transform:scale(1.15)}
+
+/* ── CARDS ── */
+.card{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r);padding:18px;margin-bottom:12px;
+  box-shadow:var(--sh2);
+}
+.card-glass{
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--border2);
+  border-radius:var(--r);padding:18px;margin-bottom:12px;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+}
+
+/* ── HERO ── */
+.hero{
+  background:linear-gradient(145deg,#1a1040 0%,#0d0d2e 50%,#0a1628 100%);
+  border-radius:var(--rxl);padding:24px 20px 20px;margin-bottom:12px;
+  position:relative;overflow:hidden;
+  border:1px solid rgba(124,109,250,.2);
+  box-shadow:0 0 60px rgba(124,109,250,.12), var(--sh);
+}
+.hero::before{
+  content:'';position:absolute;top:-60px;right:-40px;
+  width:200px;height:200px;
+  background:radial-gradient(circle,rgba(124,109,250,.3) 0%,transparent 70%);
+}
+.hero::after{
+  content:'';position:absolute;bottom:-80px;left:-20px;
+  width:160px;height:160px;
+  background:radial-gradient(circle,rgba(0,212,170,.15) 0%,transparent 70%);
+}
+.hero-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--primary2);margin-bottom:6px}
+.hero-amount{font-size:42px;font-weight:800;letter-spacing:-1px;line-height:1;margin-bottom:4px}
+.hero-amount.neg{color:var(--danger)}
+.hero-amount.pos{color:var(--success)}
+.hero-sub{font-size:13px;color:var(--t2)}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(255,255,255,.06);border:1px solid var(--border2);
+  border-radius:20px;padding:4px 10px;font-size:12px;font-weight:600;
+  margin-top:14px;color:var(--t2);
+}
+
+/* ── METRICS ROW ── */
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.metric{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r);padding:14px 16px;
+}
+.metric.accent-primary{border-color:rgba(124,109,250,.3);background:var(--primary3)}
+.metric.accent-success{border-color:rgba(0,212,170,.3);background:var(--success2)}
+.metric.accent-warn{border-color:rgba(245,158,11,.3);background:var(--warn2)}
+.metric.accent-danger{border-color:rgba(255,79,109,.3);background:var(--danger2)}
+.metric-label{font-size:11px;color:var(--t2);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px}
+.metric-val{font-size:22px;font-weight:800}
+.metric-sub{font-size:11px;color:var(--t3);margin-top:2px}
+
+/* ── SECTION TITLE ── */
+.sec-title{font-size:13px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
+  color:var(--t3);margin:16px 0 8px;padding-left:2px}
+
+/* ── BUTTONS ── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:13px 22px;border:none;border-radius:var(--rsm);cursor:pointer;
+  font-size:15px;font-weight:700;transition:all .15s;
+}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:linear-gradient(135deg,var(--primary),#5b4ed8);color:#fff;
+  box-shadow:0 4px 20px rgba(124,109,250,.35)}
+.btn-primary:hover{box-shadow:0 6px 28px rgba(124,109,250,.5)}
+.btn-success{background:linear-gradient(135deg,var(--success),#00a87e);color:#fff;
+  box-shadow:0 4px 20px rgba(0,212,170,.3)}
+.btn-danger{background:linear-gradient(135deg,var(--danger),#d63354);color:#fff}
+.btn-ghost{background:rgba(255,255,255,.06);border:1px solid var(--border2);color:var(--t1)}
+.btn-ghost:hover{background:rgba(255,255,255,.1)}
+.btn-sm{padding:7px 14px;font-size:12px;border-radius:8px}
+.btn-xs{padding:5px 10px;font-size:11px;border-radius:6px}
+.btn-full{width:100%;margin-top:6px}
+
+/* ── INPUTS ── */
+input,select,textarea{
+  background:var(--s2);border:1px solid var(--border2);
+  border-radius:var(--rsm);color:var(--t1);font-size:15px;
+  padding:12px 14px;width:100%;margin-top:6px;outline:none;
+  transition:border-color .2s;font-family:inherit;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--primary)}
+select option{background:var(--s2)}
+textarea{resize:vertical;min-height:56px}
+.field-label{font-size:12px;color:var(--t2);font-weight:600;letter-spacing:.3px;margin-top:10px;display:block}
+
+/* ── BADGES / TAGS ── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;
+  border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.3px}
+.badge-primary{background:var(--primary3);color:var(--primary2);border:1px solid rgba(124,109,250,.3)}
+.badge-success{background:var(--success2);color:var(--success);border:1px solid rgba(0,212,170,.3)}
+.badge-warn{background:var(--warn2);color:var(--warn);border:1px solid rgba(245,158,11,.3)}
+.badge-danger{background:var(--danger2);color:var(--danger);border:1px solid rgba(255,79,109,.3)}
+
+/* ── ALERTS ── */
+.alert{padding:12px 14px;border-radius:var(--rsm);font-size:13px;
+  line-height:1.5;margin-bottom:10px}
+.alert-info{background:var(--primary3);border:1px solid rgba(124,109,250,.3);color:var(--primary2)}
+.alert-success{background:var(--success2);border:1px solid rgba(0,212,170,.3);color:var(--success)}
+.alert-warn{background:var(--warn2);border:1px solid rgba(245,158,11,.3);color:var(--warn)}
+.alert-danger{background:var(--danger2);border:1px solid rgba(255,79,109,.3);color:var(--danger)}
+
+/* ── DIVIDER ── */
+.sep{border:none;border-top:1px solid var(--border);margin:14px 0}
+
+/* ── ASSET LIST ── */
+.asset-item{
+  display:flex;align-items:center;gap:12px;padding:13px 0;
+  border-bottom:1px solid var(--border);
+}
+.asset-item:last-child{border-bottom:none}
+.asset-icon{
+  width:40px;height:40px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+  background:var(--s2);border:1px solid var(--border);
+}
+.asset-name{font-weight:700;font-size:14px;color:var(--t1)}
+.asset-sub{font-size:11px;color:var(--t3);margin-top:2px}
+.asset-val{margin-left:auto;text-align:right;font-weight:800;font-size:16px}
+
+/* ── BAR ── */
+.bar-track{height:8px;background:var(--s2);border-radius:4px;overflow:hidden;margin:4px 0}
+.bar-fill{height:100%;border-radius:4px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.bar-primary{background:linear-gradient(90deg,var(--primary),var(--primary2))}
+.bar-success{background:linear-gradient(90deg,#00a87e,var(--success))}
+.bar-danger{background:linear-gradient(90deg,#d63354,var(--danger))}
+.bar-gold{background:linear-gradient(90deg,#d97706,var(--gold))}
+
+/* ── FIRE PROGRESS ── */
+.fire-ring{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:20px;text-align:center;
+}
+.fire-pct{font-size:48px;font-weight:900;
+  background:linear-gradient(135deg,var(--primary),var(--success));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.fire-track{
+  width:100%;height:10px;background:var(--s2);border-radius:5px;
+  overflow:hidden;margin:10px 0;
+}
+.fire-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--primary),var(--success));
+  border-radius:5px;transition:width 1s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 0 12px rgba(0,212,170,.4);
+}
+
+/* ── TIMELINE ── */
+.timeline{padding-left:24px;position:relative}
+.timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;
+  background:linear-gradient(180deg,var(--primary),var(--success))}
+.tl-item{position:relative;margin-bottom:20px}
+.tl-item::before{content:'';position:absolute;left:-20px;top:3px;
+  width:14px;height:14px;border-radius:50%;background:var(--s1);
+  border:2px solid var(--t3);box-shadow:0 0 0 3px var(--bg)}
+.tl-item.active-phase::before{background:var(--primary);border-color:var(--primary);
+  box-shadow:0 0 0 3px var(--bg),0 0 12px var(--primary)}
+.tl-title{font-size:14px;font-weight:700;color:var(--t1);margin:0 0 4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tl-body{font-size:13px;color:var(--t2);line-height:1.6;margin:0}
+
+/* ── MILESTONES ── */
+.ms-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px}
+.ms{
+  text-align:center;padding:12px 8px;border-radius:14px;
+  border:1px solid var(--border);background:var(--s2);
+  transition:all .2s;
+}
+.ms.done{background:var(--success2);border-color:rgba(0,212,170,.4)}
+.ms.next{background:var(--primary3);border-color:rgba(124,109,250,.4)}
+.ms-val{font-size:12px;font-weight:800;color:var(--t1);margin-top:4px}
+.ms-lbl{font-size:10px;color:var(--t3);margin-top:2px}
+
+/* ── SLIDERS ── */
+.slider-wrap{margin-bottom:16px}
+.slider-header{display:flex;justify-content:space-between;font-size:13px;color:var(--t2);margin-bottom:6px}
+.slider-header strong{color:var(--primary2);font-size:15px}
+input[type=range]{
+  -webkit-appearance:none;width:100%;height:5px;
+  background:var(--s2);border:none;outline:none;
+  border-radius:3px;cursor:pointer;margin:0;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:22px;height:22px;
+  background:linear-gradient(135deg,var(--primary),var(--primary2));
+  border-radius:50%;cursor:pointer;
+  box-shadow:0 0 0 3px var(--bg),0 0 10px rgba(124,109,250,.5);
+  transition:box-shadow .15s;
+}
+input[type=range]:active::-webkit-slider-thumb{
+  box-shadow:0 0 0 4px var(--bg),0 0 20px rgba(124,109,250,.7)
+}
+
+/* ── SIM OUTPUT ── */
+.sim-out{
+  background:linear-gradient(135deg,var(--primary3),rgba(0,212,170,.08));
+  border:1px solid rgba(124,109,250,.25);
+  border-radius:var(--r);padding:18px;margin-top:12px;
+}
+.sim-big{font-size:36px;font-weight:900;
+  background:linear-gradient(135deg,var(--primary2),var(--success));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  line-height:1.1}
+.sim-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.sim-cell .sim-label{font-size:11px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.sim-cell .sim-num{font-size:20px;font-weight:800;color:var(--t1);margin-top:2px}
+
+/* ── PROJ TABLE ── */
+.proj-wrap{overflow-x:auto;border-radius:var(--rsm);border:1px solid var(--border)}
+table.proj{width:100%;border-collapse:collapse;font-size:13px;min-width:360px}
+table.proj th{background:var(--s2);color:var(--t2);padding:8px 12px;text-align:left;
+  font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+table.proj td{padding:9px 12px;border-top:1px solid var(--border);color:var(--t1)}
+table.proj tr:hover td{background:rgba(255,255,255,.02)}
+table.proj tr.fire-row td{background:var(--success2);color:var(--success);font-weight:800}
+
+/* ── PRICE CARDS ── */
+.price-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.price-card{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r);padding:14px;
+  transition:border-color .2s;
+}
+.price-card:hover{border-color:var(--border2)}
+.price-ticker{font-size:10px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
+.price-val{font-size:20px;font-weight:800;color:var(--t1);margin:4px 0}
+.price-chg{font-size:12px;font-weight:700}
+.price-chg.pos{color:var(--success)}
+.price-chg.neg{color:var(--danger)}
+.price-loading{color:var(--t3);font-style:italic;font-size:14px}
+
+/* ── NEWS ── */
+.news-item{padding:14px 0;border-bottom:1px solid var(--border)}
+.news-item:last-child{border-bottom:none}
+.news-title-link{color:var(--t1);text-decoration:none;font-weight:700;font-size:14px;line-height:1.5;
+  display:block;margin-bottom:4px}
+.news-title-link:hover{color:var(--primary2)}
+.news-desc{font-size:12px;color:var(--t3);line-height:1.5;margin-bottom:4px}
+.news-meta{font-size:11px;color:var(--t3)}
+
+/* ── CALENDAR ── */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:14px}
+.cal-hdr{text-align:center;font-size:10px;color:var(--t3);font-weight:700;
+  text-transform:uppercase;letter-spacing:.5px;padding:4px 0}
+.cal-day{
+  text-align:center;padding:8px 2px;border-radius:10px;
+  font-size:13px;color:var(--t2);position:relative;min-height:46px;
+  transition:background .15s;
+}
+.cal-day.today{background:var(--primary);color:#fff;font-weight:800;
+  box-shadow:0 0 14px rgba(124,109,250,.5)}
+.cal-day.has-ev{border:1px solid rgba(124,109,250,.35);background:var(--primary3)}
+.cal-day.past{color:var(--t3)}
+.ev-dots{display:flex;justify-content:center;gap:3px;margin-top:3px;flex-wrap:wrap}
+.ev-dot{width:5px;height:5px;border-radius:50%}
+.dot-in{background:var(--success)}
+.dot-inv{background:var(--primary)}
+.dot-ex{background:var(--danger)}
+.event-row{
+  display:flex;align-items:center;gap:12px;padding:12px 0;
+  border-bottom:1px solid var(--border);
+}
+.event-row:last-child{border-bottom:none}
+.ev-circle{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.ev-name-text{font-weight:700;font-size:14px;color:var(--t1)}
+.ev-when{font-size:11px;color:var(--t3);margin-top:2px}
+.ev-amt{margin-left:auto;font-weight:800;font-size:16px;white-space:nowrap}
+
+/* ── CHAT ── */
+.chat-wrap{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden;margin-bottom:12px;
+}
+.chat-msgs{
+  padding:16px;min-height:200px;max-height:380px;overflow-y:auto;
+  display:flex;flex-direction:column;gap:10px;
+}
+.msg{max-width:85%;padding:11px 15px;font-size:14px;line-height:1.6;border-radius:16px}
+.msg.user{
+  background:linear-gradient(135deg,var(--primary),#5b4ed8);color:#fff;
+  align-self:flex-end;border-bottom-right-radius:4px;
+}
+.msg.ai{
+  background:var(--s2);border:1px solid var(--border2);color:var(--t1);
+  align-self:flex-start;border-bottom-left-radius:4px;
+}
+.msg.ai.loading{color:var(--t3);font-style:italic}
+.chat-input-area{
+  border-top:1px solid var(--border);padding:12px;
+  display:flex;gap:8px;align-items:flex-end;background:var(--s2);
+}
+.chat-input-area textarea{margin:0;flex:1;min-height:44px;max-height:100px;background:var(--s1)}
+
+/* ── UPLOAD ── */
+.upload-zone{
+  border:2px dashed rgba(124,109,250,.4);border-radius:var(--r);
+  padding:24px 16px;text-align:center;cursor:pointer;
+  transition:all .2s;background:var(--primary3);
+}
+.upload-zone:hover{border-color:var(--primary);background:rgba(124,109,250,.12)}
+.upload-zone input{display:none}
+.upload-ico{font-size:32px;margin-bottom:8px}
+.upload-text{font-size:14px;color:var(--t2);font-weight:600}
+.upload-sub{font-size:12px;color:var(--t3);margin-top:4px}
+.img-prev{width:100%;border-radius:var(--rsm);margin-top:10px}
+
+/* ── QUICK BUTTONS ── */
+.quick-btns{display:flex;gap:6px;flex-wrap:wrap;padding:8px 12px;
+  border-top:1px solid var(--border);background:var(--s2)}
+.quick-btns .btn{font-size:11px;padding:5px 10px;border-radius:8px;white-space:nowrap}
+
+/* ── MARKDOWN in chat ── */
+.msg.ai strong{color:var(--t1);font-weight:800}
+.msg.ai em{color:var(--primary2)}
+.msg.ai ul{margin:6px 0 2px;padding-left:18px;list-style:disc}
+.msg.ai li{margin-bottom:2px;line-height:1.5}
+.msg.ai .md-h{font-weight:800;color:var(--primary2);margin:6px 0 2px;font-size:13px}
+.msg.briefing{border-left:3px solid var(--primary)!important;background:var(--primary3)!important}
+
+/* ── PENDING ACTIONS ── */
+#pending-actions{
+  padding:12px 14px;border-top:1px solid var(--border);
+  background:rgba(245,158,11,.06);
+}
+.action-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.action-row:last-child{margin-bottom:0}
+@keyframes dotBlink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+.typing-dot{display:inline-block;width:7px;height:7px;border-radius:50%;
+  background:var(--t2);margin:0 2px;animation:dotBlink 1.4s ease-in-out infinite}
+.typing-dot:nth-child(2){animation-delay:.2s}
+.typing-dot:nth-child(3){animation-delay:.4s}
+
+/* ── HIDDEN ── */
+.hidden{display:none!important}
+
+/* ── UTILS ── */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pos{color:var(--success)} .neg{color:var(--danger)} .gold{color:var(--gold)}
+.t1{color:var(--t1)} .t2{color:var(--t2)} .t3{color:var(--t3)}
+.fw8{font-weight:800} .fw7{font-weight:700}
+.fs11{font-size:11px} .fs12{font-size:12px} .fs13{font-size:13px}
+.mt4{margin-top:4px} .mt8{margin-top:8px} .mt12{margin-top:12px} .mt16{margin-top:16px}
+.mb0{margin-bottom:0}
+.step-num{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:22px;height:22px;border-radius:50%;
+  background:var(--primary3);border:1px solid rgba(124,109,250,.4);
+  color:var(--primary2);font-size:11px;font-weight:800;margin-right:6px;flex-shrink:0;
+}
+
+@media(min-width:640px){
+  .section{padding:20px 20px 8px;max-width:700px}
+  .price-grid{grid-template-columns:repeat(3,1fr)}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════ PIANO ══ -->
+<div class="section active" id="tab-piano">
+
+  <div class="hero">
+    <div class="hero-label">Patrimonio netto</div>
+    <div class="hero-amount neg" id="piano-net">—</div>
+    <div class="hero-sub">22 anni &middot; Piano FIRE attivo &middot; obiettivo 39 anni</div>
+    <div class="hero-badge">
+      <span>🔥</span>
+      <span id="fire-pct-badge">0,03% verso i 550k</span>
+    </div>
+  </div>
+
+  <div class="metrics">
+    <div class="metric accent-success">
+      <div class="metric-label">Attivi</div>
+      <div class="metric-val pos" id="m-actives">—</div>
+      <div class="metric-sub">investimenti + cash</div>
+    </div>
+    <div class="metric accent-danger">
+      <div class="metric-label">Passivi</div>
+      <div class="metric-val neg" id="m-debts">—</div>
+      <div class="metric-sub">prestito personale</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="metric-label" style="margin-bottom:8px;">Progresso verso FIRE &mdash; €550.000</div>
+    <div class="fire-track"><div class="fire-fill" id="fire-fill" style="width:.03%"></div></div>
+    <div style="display:flex;justify-content:space-between;margin-top:4px;">
+      <span class="fs11 t3" id="fire-now-lbl">€174</span>
+      <span class="fs11 t3">€550.000</span>
+    </div>
+  </div>
+
+  <div id="prossimo-alert" class="alert alert-info">Caricamento...</div>
+
+  <div class="sec-title">Le 3 Fasi del Piano</div>
+  <div class="card">
+    <div class="timeline">
+      <div class="tl-item active-phase">
+        <div class="tl-title">Fondamenta <span class="badge badge-warn">In corso</span></div>
+        <p class="tl-body">VUAA €150/mese il 12. Extra debito €250/mese. Non vendere mai durante i ribassi.</p>
+      </div>
+      <div class="tl-item">
+        <div class="tl-title">Accelerazione <span class="badge badge-primary">da giugno 2026</span></div>
+        <p class="tl-body">Spese a €490. Liberi ~€1.310/mese. VUAA €600 + €600 extra debito &rarr; zero entro feb 2027.</p>
+      </div>
+      <div class="tl-item">
+        <div class="tl-title">Full Invest <span class="badge badge-primary">da mar 2027</span></div>
+        <p class="tl-body">Debito zero. €1.200+/mese: 80% VUAA + 20% VWCE. Il compounding va a pieno regime.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-title">Countdown Debito</div>
+  <div class="card">
+    <div class="row2">
+      <div>
+        <div class="metric-label">Debito residuo</div>
+        <div class="fw8 neg" style="font-size:24px;" id="debt-rem">9.500,00</div>
+      </div>
+      <div>
+        <div class="metric-label">Mesi alla liberta</div>
+        <div class="fw8" style="font-size:24px;color:var(--warn);" id="debt-mo">—</div>
+      </div>
+    </div>
+    <div class="bar-track mt8"><div class="bar-fill bar-danger" id="debt-bar" style="width:100%"></div></div>
+    <div class="sep"></div>
+    <div class="row2">
+      <div><label class="field-label">Debito (EUR)</label><input type="number" id="in-debt" value="9500" min="0"></div>
+      <div><label class="field-label">Extra/mese (EUR)</label><input type="number" id="in-debt-monthly" value="250" min="0"></div>
+    </div>
+    <button class="btn btn-ghost btn-sm mt8" onclick="calcDebt()">Calcola</button>
+    <div class="alert alert-warn mt8 mb0 fs12">Da giugno porta il pagamento extra a €600/mese &rarr; libero dal debito a 23 anni.</div>
+  </div>
+
+  <div class="sec-title">Milestone</div>
+  <div class="ms-grid" id="ms-container"></div>
+
+  <div class="sec-title">Proiezione FIRE</div>
+  <div class="proj-wrap card" style="padding:0;">
+    <table class="proj">
+      <thead><tr><th>Anno</th><th>Eta</th><th>€150/mese</th><th>€1.200/mese</th></tr></thead>
+      <tbody>
+        <tr><td>2029</td><td>25</td><td class="t2">7k</td><td>28k</td></tr>
+        <tr><td>2031</td><td>27</td><td class="t2">15k</td><td>67k</td></tr>
+        <tr><td>2036</td><td>32</td><td class="t2">36k</td><td>205k</td></tr>
+        <tr><td>2041</td><td>37</td><td class="t2">66k</td><td>430k</td></tr>
+        <tr class="fire-row"><td>2043</td><td>39</td><td>82k</td><td>🔥 545k FIRE</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div style="height:8px"></div>
+</div>
+
+<!-- ══════════════════════════════════ PORTAFOGLIO ══ -->
+<div class="section" id="tab-patrimonio">
+  <div class="sec-title">Riepilogo</div>
+  <div class="metrics">
+    <div class="metric accent-success"><div class="metric-label">Totale Attivi</div><div class="metric-val pos" id="tot-assets">—</div></div>
+    <div class="metric accent-danger"><div class="metric-label">Totale Passivi</div><div class="metric-val neg" id="tot-debts">—</div></div>
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t3);margin-bottom:4px">
+      <span>Attivi</span><span id="bar-pct-act">—</span>
+    </div>
+    <div class="bar-track"><div class="bar-fill bar-success" id="bar-assets" style="width:2%"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t3);margin:6px 0 4px">
+      <span>Passivi</span><span id="bar-pct-dbt">—</span>
+    </div>
+    <div class="bar-track"><div class="bar-fill bar-danger" id="bar-debts" style="width:98%"></div></div>
+  </div>
+
+  <div class="alert alert-warn fs12">⚠️ Robo-Advisor "Fondo emergenza" su Revolut ha Rischio 5/5: NON e un vero fondo emergenza. Dopo aver estinto il debito, costruisci €3-5k su un conto deposito svincolato.</div>
+
+  <div class="sec-title">Le tue voci</div>
+  <div class="card" style="padding:0 18px">
+    <ul style="list-style:none;margin:0;padding:0" id="asset-list"></ul>
+  </div>
+  <button class="btn btn-ghost btn-full mt8" onclick="showAddForm()">+ Aggiungi voce</button>
+
+  <div class="card mt8 hidden" id="add-form">
+    <div class="fw7" style="font-size:16px;margin-bottom:10px;" id="form-title">Aggiungi voce</div>
+    <div class="row2">
+      <div><label class="field-label">Nome</label><input type="text" id="f-name" placeholder="es. VUAA, Conto"></div>
+      <div><label class="field-label">Categoria</label>
+        <select id="f-cat">
+          <option value="etf">ETF / Fondi</option>
+          <option value="stock">Azione singola</option>
+          <option value="crypto">Crypto</option>
+          <option value="cash">Liquidita</option>
+          <option value="property">Immobile</option>
+          <option value="debt">Debito</option>
+          <option value="other">Altro</option>
+        </select>
+      </div>
+    </div>
+    <div class="row2 mt8">
+      <div><label class="field-label">Valore (EUR)</label><input type="number" id="f-val" step="0.01"></div>
+      <div><label class="field-label">Ticker (opz.)</label><input type="text" id="f-ticker" placeholder="VUAA.MI"></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+      <button class="btn btn-primary btn-sm" onclick="saveAsset()">Salva</button>
+      <button class="btn btn-ghost btn-sm" onclick="cancelForm()">Annulla</button>
+      <button class="btn btn-danger btn-sm hidden" id="btn-delete" onclick="deleteAsset()">Elimina</button>
+    </div>
+  </div>
+
+  <div class="alert alert-warn fs12 mt8">⚠️ EMBC (Embecta) e un'azione singola in perdita. Quando recupera, valuta di liquidarla e reinvestire in VUAA.</div>
+  <div style="height:8px"></div>
+</div>
+
+<!-- ══════════════════════════════════ SIMULATORE ══ -->
+<div class="section" id="tab-simulatore">
+  <div class="sec-title">Simulatore Interesse Composto</div>
+  <div class="card">
+    <div class="slider-wrap">
+      <div class="slider-header"><span class="t2">Investimento mensile</span><strong id="lbl-mo">€600/mese</strong></div>
+      <input type="range" id="sl-monthly" min="50" max="2000" value="600" step="50" oninput="updateSim()">
+    </div>
+    <div class="slider-wrap">
+      <div class="slider-header"><span class="t2">Tasso annuo</span><strong id="lbl-rate">8%</strong></div>
+      <input type="range" id="sl-rate" min="4" max="12" value="8" step="0.5" oninput="updateSim()">
+    </div>
+    <div class="slider-wrap">
+      <div class="slider-header"><span class="t2">Anni</span><strong id="lbl-years">17 anni</strong></div>
+      <input type="range" id="sl-years" min="1" max="35" value="17" step="1" oninput="updateSim()">
+    </div>
+    <div class="sim-out">
+      <div class="fs12 t3" style="text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Capitale finale</div>
+      <div class="sim-big" id="sim-final">—</div>
+      <div class="sim-row">
+        <div class="sim-cell"><div class="sim-label">Versato</div><div class="sim-num t2" id="sim-paid">—</div></div>
+        <div class="sim-cell"><div class="sim-label">Guadagno</div><div class="sim-num pos" id="sim-gain">—</div></div>
+      </div>
+      <div style="margin-top:10px" id="sim-fire-msg"></div>
+    </div>
+  </div>
+
+  <div class="sec-title">Confronto scenari</div>
+  <div class="row2">
+    <div class="metric accent-warn">
+      <div class="metric-label">Ora €150/mese</div>
+      <div class="metric-val" style="color:var(--warn);font-size:20px" id="cmp-now">—</div>
+      <div class="metric-sub">a 39 anni (17 anni)</div>
+    </div>
+    <div class="metric accent-success">
+      <div class="metric-label">Full invest €1.200</div>
+      <div class="metric-val pos" style="font-size:20px" id="cmp-target">—</div>
+      <div class="metric-sub">a 39 anni (15 anni)</div>
+    </div>
+  </div>
+
+  <div class="sec-title">Tabella anno per anno</div>
+  <div class="proj-wrap">
+    <table class="proj"><thead><tr><th>Anno</th><th>Eta</th><th>Versato</th><th>Valore</th><th>Guadagno</th></tr></thead>
+    <tbody id="proj-body"></tbody></table>
+  </div>
+  <div style="height:8px"></div>
+</div>
+
+<!-- ══════════════════════════════════ CALENDARIO ══ -->
+<div class="section" id="tab-calendario">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <div class="sec-title" style="margin:0" id="cal-month-title">Calendario</div>
+    <button class="btn btn-ghost btn-xs" onclick="showEventForm()">+ Evento</button>
+  </div>
+  <div class="card">
+    <div class="cal-grid" id="cal-hdrs"></div>
+    <div class="cal-grid" id="cal-days"></div>
+    <div class="sep"></div>
+    <button class="btn btn-success btn-sm btn-full" onclick="applyPastEvents()">Applica eventi passati al portafoglio</button>
+    <div class="fs11 t3 mt4">Aggiorna automaticamente i valori degli investimenti per gli eventi del mese gia avvenuti.</div>
+  </div>
+
+  <div class="sec-title">Questo mese</div>
+  <div class="card" style="padding:0 18px"><div id="month-events-list"></div></div>
+
+  <div class="card mt8 hidden" id="event-form">
+    <div class="fw7" style="font-size:16px;margin-bottom:10px" id="ef-title">Aggiungi evento</div>
+    <div class="row2">
+      <div><label class="field-label">Nome</label><input type="text" id="ef-name" placeholder="es. Stipendio"></div>
+      <div><label class="field-label">Tipo</label>
+        <select id="ef-type" onchange="onEventTypeChange()">
+          <option value="income">Entrata</option>
+          <option value="investment">Investimento</option>
+          <option value="expense">Uscita fissa</option>
+        </select>
+      </div>
+    </div>
+    <div class="row2 mt8">
+      <div><label class="field-label">Importo (EUR)</label><input type="number" id="ef-amount" step="0.01" min="0"></div>
+      <div><label class="field-label">Giorno del mese</label><input type="number" id="ef-day" min="1" max="31"></div>
+    </div>
+    <div id="ef-asset-row" class="hidden mt8">
+      <label class="field-label">Collega a voce portafoglio</label>
+      <select id="ef-asset-id"><option value="">-- nessun collegamento --</option></select>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+      <button class="btn btn-primary btn-sm" onclick="saveEvent()">Salva</button>
+      <button class="btn btn-ghost btn-sm" onclick="cancelEventForm()">Annulla</button>
+      <button class="btn btn-danger btn-sm hidden" id="btn-ev-delete" onclick="deleteEvent()">Elimina</button>
+    </div>
+  </div>
+
+  <div class="sec-title">Tutti gli eventi</div>
+  <div class="card" style="padding:0 18px"><div id="all-events-list"></div></div>
+  <div style="height:8px"></div>
+</div>
+
+<!-- ══════════════════════════════════ MERCATI ══ -->
+<div class="section" id="tab-news">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <div class="sec-title" style="margin:0" id="price-ts">Prezzi live</div>
+    <button class="btn btn-ghost btn-xs" onclick="loadPrices(true)">&#8635; Aggiorna</button>
+  </div>
+  <div class="price-grid">
+    <div class="price-card"><div class="price-ticker">VUAA · S&amp;P500</div><div class="price-val" id="p-vuaa"><span class="price-loading">...</span></div><div class="price-chg" id="pc-vuaa"></div></div>
+    <div class="price-card"><div class="price-ticker">EMBC · Embecta</div><div class="price-val" id="p-embc"><span class="price-loading">...</span></div><div class="price-chg" id="pc-embc"></div></div>
+    <div class="price-card"><div class="price-ticker">BTC · Bitcoin</div><div class="price-val" id="p-btc"><span class="price-loading">...</span></div><div class="price-chg" id="pc-btc"></div></div>
+    <div class="price-card"><div class="price-ticker">S&amp;P 500 · Index</div><div class="price-val" id="p-sp"><span class="price-loading">...</span></div><div class="price-chg" id="pc-sp"></div></div>
+    <div class="price-card"><div class="price-ticker">GC · Oro oz</div><div class="price-val" id="p-gold"><span class="price-loading">...</span></div><div class="price-chg" id="pc-gold"></div></div>
+    <div class="price-card"><div class="price-ticker">VWCE · World</div><div class="price-val" id="p-vwce"><span class="price-loading">...</span></div><div class="price-chg" id="pc-vwce"></div></div>
+  </div>
+
+  <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center">
+    <button class="btn btn-primary btn-sm" id="src-ansa" onclick="loadNews('ansa')">ANSA Economia</button>
+    <button class="btn btn-ghost btn-sm" id="src-sole" onclick="loadNews('sole')">Sole 24 Ore</button>
+    <span class="fs11 t3" id="news-ts"></span>
+  </div>
+
+  <div class="card" style="padding:0 18px">
+    <div style="padding:16px 0;color:var(--t3);font-size:13px;text-align:center" id="news-loader">Caricamento notizie...</div>
+    <div id="news-list"></div>
+  </div>
+  <div class="fs11 t3 mt4">Prezzi aggiornati ogni 5 min. <span class="badge badge-success">VUAA</span> = notizia rilevante per S&amp;P500.</div>
+  <div style="height:8px"></div>
+</div>
+
+<!-- ══════════════════════════════════ AI ══ -->
+<div class="section" id="tab-ai">
+
+  <!-- API Key compatta -->
+  <div class="card" style="padding:12px 14px">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <input type="password" id="api-key-input" placeholder="gsk_..." style="flex:1;min-width:150px;margin:0;font-size:13px;padding:9px 12px">
+      <button class="btn btn-primary btn-sm" onclick="saveApiKey()" style="flex-shrink:0">Salva</button>
+      <div id="api-key-status"></div>
+    </div>
+    <div class="fs11 t3 mt4">
+      Chiave <strong style="color:var(--success)">gratuita</strong> da <strong style="color:var(--primary2)">console.groq.com</strong> &rarr; API Keys &nbsp;&middot;&nbsp; 14.400 richieste/giorno gratis &middot; modello llama-3.3-70b
+    </div>
+  </div>
+
+  <div class="alert alert-info fs12">
+    💬 Dimmi cosa &egrave; successo: <em>"Ho ricevuto stipendio"</em>, <em>"Comprato 2 quote VUAA a €118"</em>, o fai una domanda. L'agente risponde, propone gli aggiornamenti al portafoglio e genera un briefing automatico ogni mattina.
+  </div>
+
+  <!-- Chat agente -->
+  <div class="chat-wrap">
+    <div class="chat-msgs" id="chat-box">
+      <div class="msg ai">Ciao! Sono il tuo agente finanziario <strong>Groq AI</strong> (gratuito). Dimmi cosa &egrave; successo oggi oppure fai una domanda sul tuo piano FIRE. Aggiungi la chiave API sopra per sbloccarmi.</div>
+    </div>
+    <!-- Area azioni suggerite da AI -->
+    <div id="pending-actions" class="hidden"></div>
+    <!-- Quick actions -->
+    <div class="quick-btns">
+      <button class="btn btn-ghost" onclick="quickAsk('Analizza il mio portafoglio oggi e dimmi una cosa concreta da fare')">📊 Analizza</button>
+      <button class="btn btn-ghost" onclick="quickAsk('Cosa devo fare questa settimana con le mie finanze? Considera il calendario e il piano')">📅 Settimana</button>
+      <button class="btn btn-ghost" onclick="quickAsk('Dove sono rispetto all\'obiettivo FIRE? Aggiornami con numeri precisi e proiezione')">🔥 FIRE check</button>
+      <button class="btn btn-ghost" onclick="quickAsk('Strategia ottimale per abbattere il debito più velocemente mantenendo VUAA attivo')">💳 Debito</button>
+    </div>
+    <div class="chat-input-area">
+      <label style="cursor:pointer;font-size:22px;color:var(--t2);flex-shrink:0;padding:4px 0;line-height:1" title="Allega screenshot">
+        📷<input type="file" id="img-upload" accept="image/*" onchange="onImageUpload(event)" style="display:none">
+      </label>
+      <textarea id="chat-input" placeholder="es. 'Stipendio arrivato €2300', 'Comprato VUAA €150', 'Devo vendere EMBC?'" onkeydown="onChatKey(event)"></textarea>
+      <button class="btn btn-primary btn-sm" onclick="sendChat()">Invia</button>
+    </div>
+  </div>
+
+  <!-- Anteprima immagine allegata -->
+  <div id="img-preview-area" class="card hidden" style="padding:10px;margin-top:-6px">
+    <img id="img-preview" style="width:100%;border-radius:8px;margin-bottom:8px;max-height:180px;object-fit:contain" alt="screenshot">
+    <button class="btn btn-ghost btn-xs" onclick="clearImage()" style="font-size:11px">✕ Rimuovi immagine</button>
+  </div>
+
+  <div class="fs11 t3 mt4" style="margin-bottom:12px">Il tuo portafoglio aggiornato viene inviato ad ogni messaggio. Ctrl+Enter per inviare.</div>
+
+  <div class="sec-title">Consigli personalizzati</div>
+  <div class="card">
+    <div class="fw7 mb0" style="font-size:15px;color:var(--primary2);margin-bottom:10px">Cosa fare adesso</div>
+    <div class="alert alert-info fs12 mb0">Stipendio il 10. Il 12 escono VUAA €150 + Robo €10. Paga €250 extra sul prestito questo mese.</div>
+    <div class="sep"></div>
+    <p style="font-size:14px;color:var(--t2);line-height:1.7;margin:0">
+      <span class="step-num">1</span><strong style="color:var(--t1)">Non toccare VUAA.</strong> Se il mercato scende del 30% stai comprando piu quote allo stesso prezzo.<br>
+      <span class="step-num" style="margin-top:8px;display:inline-flex">2</span><strong style="color:var(--t1)">Paga il debito aggressivamente.</strong> Da giugno porta il pagamento extra a €600/mese.<br>
+      <span class="step-num" style="margin-top:8px;display:inline-flex">3</span><strong style="color:var(--t1)">Non aumentare le spese</strong> quando lo stipendio cresce. Investi la differenza tutta.
+    </p>
+  </div>
+  <div class="card">
+    <div class="fw7" style="font-size:15px;color:var(--primary2);margin-bottom:8px">VUAA vs Diversificazione</div>
+    <p class="fs13 t2" style="margin:0;line-height:1.7">Tieni 100% VUAA per i primi 3-5 anni. Quando superi €10-15k di portafoglio, aggiungi 20% VWCE per esposizione globale. <strong style="color:var(--t1)">EMBC:</strong> liquidala quando recupera, reinvesti in VUAA.</p>
+  </div>
+  <div class="card">
+    <div class="fw7" style="font-size:15px;color:var(--primary2);margin-bottom:8px">Fondo Emergenza vero</div>
+    <p class="fs13 t2" style="margin:0;line-height:1.7">Il Robo-Advisor Rischio 5/5 NON &egrave; un fondo emergenza. Costruisci €3-5k su un <strong style="color:var(--t1)">conto deposito svincolato</strong> (Illimity, Banca Progetto) al 2-3%.</p>
+  </div>
+  <div style="height:8px"></div>
+</div>
+
+<!-- ══════════════════════════════════ BOTTOM NAV ══ -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" data-tab="piano"><span class="ico">🎯</span>Piano</button>
+  <button class="nav-btn" data-tab="patrimonio"><span class="ico">💼</span>Portafoglio</button>
+  <button class="nav-btn" data-tab="simulatore"><span class="ico">📊</span>Simulatore</button>
+  <button class="nav-btn" data-tab="calendario"><span class="ico">📅</span>Calendario</button>
+  <button class="nav-btn" data-tab="news"><span class="ico">📈</span>Mercati</button>
+  <button class="nav-btn" data-tab="ai"><span class="ico">🤖</span>AI</button>
+</nav>
+
+<script>
+// ── TAB NAV ────────────────────────────────────────────────────────────────
+document.querySelectorAll('.nav-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+    if(btn.dataset.tab==='news'){loadPrices(false);loadNews();}
+    if(btn.dataset.tab==='simulatore')updateSim();
+    if(btn.dataset.tab==='patrimonio')renderAssets();
+    if(btn.dataset.tab==='calendario')renderCalendar();
+    if(btn.dataset.tab==='piano'){renderAssets();calcDebt();}
+    if(btn.dataset.tab==='ai'){renderApiKeyStatus();autoBriefing();}
+  });
+});
+
+// ── STORAGE ────────────────────────────────────────────────────────────────
+const LS_ASSETS='gp_assets_v2',LS_EVENTS='gp_events_v1',LS_APPLIED='gp_applied_v1',LS_APIKEY='gp_apikey',LS_GROQKEY='gp_groqkey';
+const DEFAULT_ASSETS=[
+  {id:1,name:'VUAA - Vanguard S&P 500',cat:'etf',  val:121.29,ticker:'VUAA.MI'},
+  {id:2,name:'Embecta (EMBC)',          cat:'stock',val:22.27, ticker:'EMBC'},
+  {id:3,name:'Robo-Advisor Revolut',    cat:'etf',  val:30.53, ticker:''},
+  {id:4,name:'Cash',                    cat:'cash', val:100,   ticker:''},
+  {id:5,name:'Prestito personale',      cat:'debt', val:9500,  ticker:''},
+];
+const DEFAULT_EVENTS=[
+  {id:1,name:'Stipendio',    type:'income',    amount:2300,day:10,assetId:null,active:true},
+  {id:2,name:'VUAA acquisto',type:'investment',amount:150, day:12,assetId:1,  active:true},
+  {id:3,name:'Robo-Advisor', type:'investment',amount:10,  day:12,assetId:3,  active:true},
+];
+const get=k=>{try{return JSON.parse(localStorage.getItem(k));}catch{return null;}};
+const set=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+const getAssets= ()=>get(LS_ASSETS) ||DEFAULT_ASSETS;
+const getEvents= ()=>get(LS_EVENTS) ||DEFAULT_EVENTS;
+const getApplied=()=>get(LS_APPLIED)||{};
+const getApiKey= ()=>localStorage.getItem(LS_APIKEY)||'';
+const getGroqKey= ()=>localStorage.getItem(LS_GROQKEY)||'';
+const setGroqKey= v=>localStorage.setItem(LS_GROQKEY,v);
+const setAssets= v=>set(LS_ASSETS,v);
+const setEvents= v=>set(LS_EVENTS,v);
+const setApplied=v=>set(LS_APPLIED,v);
+const setApiKey= v=>localStorage.setItem(LS_APIKEY,v);
+
+// ── FORMAT ─────────────────────────────────────────────────────────────────
+const fmtN=(n,d=2)=>(n<0?'-':'')+Math.abs(n).toLocaleString('it-IT',{minimumFractionDigits:d,maximumFractionDigits:d});
+const fmtK=n=>{const a=Math.abs(n);return(n<0?'-':'')+(a>=1000?(a/1000).toFixed(1)+'k':a.toFixed(0));};
+
+// ── PATRIMONIO ─────────────────────────────────────────────────────────────
+const CAT_ICO={etf:'📈',stock:'🏢',crypto:'₿',cash:'💵',property:'🏠',debt:'💳',other:'📦'};
+const CAT_LBL={etf:'ETF/Fondi',stock:'Azione',crypto:'Crypto',cash:'Liquidita',property:'Immobile',debt:'Debito',other:'Altro'};
+let editingAssetId=null;
+
+function computeTotals(){
+  const assets=getAssets();let act=0,dbt=0;
+  assets.forEach(a=>a.cat==='debt'?dbt+=a.val:act+=a.val);
+  return{assets,actives:act,debts:dbt,net:act-dbt};
+}
+
+function renderAssets(){
+  const{assets,actives,debts,net}=computeTotals();
+  const total=actives+debts;
+  // Piano tab
+  const pn=document.getElementById('piano-net');
+  if(pn){pn.textContent=fmtN(net);pn.className='hero-amount '+(net>=0?'pos':'neg');}
+  const ma=document.getElementById('m-actives');if(ma)ma.textContent=fmtN(actives);
+  const md=document.getElementById('m-debts');if(md)md.textContent=fmtN(debts);
+  const fp=document.getElementById('fire-pct-badge');
+  if(fp){const pct=(actives/550000*100);fp.textContent=(pct<0.1?pct.toFixed(3):pct.toFixed(1))+'% verso i 550k';}
+  const ff=document.getElementById('fire-fill');
+  if(ff)ff.style.width=Math.max(.1,actives/550000*100).toFixed(3)+'%';
+  const fl=document.getElementById('fire-now-lbl');if(fl)fl.textContent=fmtN(actives,0);
+  // Patrimonio tab
+  const ta=document.getElementById('tot-assets');if(ta)ta.textContent=fmtN(actives);
+  const td=document.getElementById('tot-debts');if(td)td.textContent=fmtN(debts);
+  if(total>0){
+    const pa=Math.max(2,actives/total*100);
+    const pd=Math.max(2,debts/total*100);
+    document.getElementById('bar-assets').style.width=pa.toFixed(1)+'%';
+    document.getElementById('bar-debts').style.width=pd.toFixed(1)+'%';
+    document.getElementById('bar-pct-act').textContent=pa.toFixed(1)+'%';
+    document.getElementById('bar-pct-dbt').textContent=pd.toFixed(1)+'%';
+  }
+  const list=document.getElementById('asset-list');
+  if(!list)return;
+  list.innerHTML='';
+  assets.forEach(a=>{
+    const li=document.createElement('li');
+    li.className='asset-item';
+    const isDebt=a.cat==='debt';
+    li.innerHTML='<div class="asset-icon">'+(CAT_ICO[a.cat]||'📦')+'</div>'
+      +'<div style="flex:1;min-width:0"><div class="asset-name">'+a.name+'</div>'
+      +'<div class="asset-sub">'+(CAT_LBL[a.cat]||a.cat)+(a.ticker?' · '+a.ticker:'')+'</div></div>'
+      +'<div class="asset-val '+(isDebt?'neg':'pos')+'">'+(isDebt?'-':'')+fmtN(a.val)+'</div>'
+      +'<button class="btn btn-ghost btn-xs" onclick="editAsset('+a.id+')" style="margin-left:8px;flex-shrink:0">Mod.</button>';
+    list.appendChild(li);
+  });
+  renderMilestones(actives);
+}
+
+function renderMilestones(actives){
+  const MS=[
+    {v:0,l:'Debito zero',i:'🏁'},{v:5000,l:'5k',i:'🌱'},{v:10000,l:'10k',i:'💪'},
+    {v:50000,l:'50k',i:'🚀'},{v:100000,l:'100k',i:'💎'},{v:250000,l:'250k',i:'⭐'},{v:550000,l:'🔥 FIRE',i:'🏖️'},
+  ];
+  const ni=MS.findIndex(m=>actives<m.v);
+  const el=document.getElementById('ms-container');if(!el)return;
+  el.innerHTML=MS.map((m,i)=>{
+    const done=actives>=m.v,isNext=i===ni;
+    return '<div class="ms '+(done?'done':isNext?'next':'')+'">'
+      +'<div style="font-size:20px">'+m.i+'</div>'
+      +'<div class="ms-val">'+m.l+'</div>'
+      +'<div class="ms-lbl">'+(done?'✓':isNext?'prossimo':'')+'</div></div>';
+  }).join('');
+}
+
+function showAddForm(){
+  editingAssetId=null;
+  document.getElementById('form-title').textContent='Aggiungi voce';
+  ['f-name','f-val','f-ticker'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-cat').value='etf';
+  document.getElementById('btn-delete').classList.add('hidden');
+  document.getElementById('add-form').classList.remove('hidden');
+  document.getElementById('add-form').scrollIntoView({behavior:'smooth'});
+}
+function editAsset(id){
+  const a=getAssets().find(x=>x.id===id);if(!a)return;
+  editingAssetId=id;
+  document.getElementById('form-title').textContent='Modifica voce';
+  document.getElementById('f-name').value=a.name;
+  document.getElementById('f-cat').value=a.cat;
+  document.getElementById('f-val').value=a.val;
+  document.getElementById('f-ticker').value=a.ticker||'';
+  document.getElementById('btn-delete').classList.remove('hidden');
+  document.getElementById('add-form').classList.remove('hidden');
+  document.getElementById('add-form').scrollIntoView({behavior:'smooth'});
+}
+function saveAsset(){
+  const name=document.getElementById('f-name').value.trim();
+  const cat=document.getElementById('f-cat').value;
+  const val=parseFloat(document.getElementById('f-val').value);
+  const ticker=document.getElementById('f-ticker').value.trim();
+  if(!name||isNaN(val)||val<0){alert('Inserisci nome e valore.');return;}
+  const assets=getAssets();
+  if(editingAssetId!==null){
+    const i=assets.findIndex(x=>x.id===editingAssetId);
+    if(i>=0)assets[i]={...assets[i],name,cat,val,ticker};
+  }else assets.push({id:Math.max(0,...assets.map(a=>a.id))+1,name,cat,val,ticker});
+  setAssets(assets);cancelForm();renderAssets();
+}
+function deleteAsset(){
+  if(editingAssetId===null||!confirm('Eliminare?'))return;
+  setAssets(getAssets().filter(x=>x.id!==editingAssetId));cancelForm();renderAssets();
+}
+function cancelForm(){document.getElementById('add-form').classList.add('hidden');editingAssetId=null;}
+
+// ── DEBT ───────────────────────────────────────────────────────────────────
+function calcDebt(){
+  const debt=parseFloat(document.getElementById('in-debt').value)||9500;
+  const mo=parseFloat(document.getElementById('in-debt-monthly').value)||250;
+  document.getElementById('debt-rem').textContent=fmtN(debt);
+  document.getElementById('debt-mo').textContent=mo>0?Math.ceil(debt/mo)+' mesi':'N/D';
+  const INITIAL=9500;
+  const pct=Math.max(0,100-(debt/INITIAL*100));
+  const bar=document.getElementById('debt-bar');if(bar)bar.style.width=Math.max(2,100-pct)+'%';
+  // Update asset
+  const assets=getAssets();const d=assets.find(x=>x.cat==='debt');
+  if(d){d.val=debt;setAssets(assets);}
+  renderAssets();
+  // Update next event alert
+  renderNextEventAlert();
+}
+
+function renderNextEventAlert(){
+  const el=document.getElementById('prossimo-alert');if(!el)return;
+  const today=new Date().getDate();
+  const events=getEvents().filter(e=>e.active).sort((a,b)=>a.day-b.day);
+  const next=events.find(e=>e.day>=today)||events[0];
+  if(!next){el.textContent='Nessun evento impostato.';return;}
+  const days=next.day>=today?next.day-today:0;
+  const sign=next.type==='income'?'+':'-';
+  el.innerHTML='<strong>Prossimo:</strong> '+next.name+' il '+next.day
+    +(next.type==='income'?' <span style="color:var(--success)">'+sign+fmtN(next.amount)+'</span>'
+      :' <span style="color:var(--danger)">'+sign+fmtN(next.amount)+'</span>')
+    +(days===0?' &mdash; oggi!':days===1?' &mdash; domani':' &mdash; tra '+days+' giorni');
+}
+
+// ── SIMULATORE ─────────────────────────────────────────────────────────────
+function compound(m,r,y){const mr=r/100/12;return mr===0?m*12*y:m*((Math.pow(1+mr,y*12)-1)/mr)*(1+mr);}
+function updateSim(){
+  const m=parseInt(document.getElementById('sl-monthly').value);
+  const r=parseFloat(document.getElementById('sl-rate').value);
+  const y=parseInt(document.getElementById('sl-years').value);
+  document.getElementById('lbl-mo').textContent='€'+m+'/mese';
+  document.getElementById('lbl-rate').textContent=r+'%';
+  document.getElementById('lbl-years').textContent=y+' anni';
+  const fin=compound(m,r,y),paid=m*12*y,gain=fin-paid;
+  document.getElementById('sim-final').textContent=fmtK(fin);
+  document.getElementById('sim-paid').textContent=fmtK(paid);
+  document.getElementById('sim-gain').textContent='+'+fmtK(gain);
+  document.getElementById('sim-fire-msg').innerHTML=fin>=550000
+    ?'<span class="badge badge-success">🔥 FIRE raggiunto con questo piano!</span>'
+    :'<span class="badge badge-warn">Mancano '+fmtK(550000-fin)+' al FIRE. Aumenta mensile o anni.</span>';
+  document.getElementById('cmp-now').textContent=fmtK(compound(150,8,17));
+  document.getElementById('cmp-target').textContent=fmtK(compound(1200,8,15));
+  const body=document.getElementById('proj-body');body.innerHTML='';let fm=false;
+  for(let i=1;i<=y;i++){
+    const v=compound(m,r,i),p=m*12*i;
+    const tr=document.createElement('tr');
+    if(!fm&&v>=550000){tr.className='fire-row';fm=true;}
+    tr.innerHTML='<td>'+(2026+i)+'</td><td>'+(22+i)+'</td><td class="t2">'+fmtK(p)+'</td><td>'+fmtK(v)+'</td><td class="pos">+'+fmtK(v-p)+'</td>';
+    body.appendChild(tr);
+  }
+}
+
+// ── CALENDARIO ─────────────────────────────────────────────────────────────
+let editingEventId=null;
+function renderCalendar(){
+  const now=new Date(),year=now.getFullYear(),month=now.getMonth(),today=now.getDate();
+  const events=getEvents().filter(e=>e.active);
+  const applied=getApplied();
+  const mk=year+'-'+(month+1);
+  document.getElementById('cal-month-title').textContent=
+    now.toLocaleDateString('it-IT',{month:'long',year:'numeric'}).replace(/^\w/,c=>c.toUpperCase());
+  // Headers
+  document.getElementById('cal-hdrs').innerHTML=['Lu','Ma','Me','Gi','Ve','Sa','Do']
+    .map(d=>'<div class="cal-hdr">'+d+'</div>').join('');
+  // Days
+  const first=new Date(year,month,1).getDay(),off=(first+6)%7;
+  const dim=new Date(year,month+1,0).getDate();
+  const grid=document.getElementById('cal-days');grid.innerHTML='';
+  for(let i=0;i<off;i++)grid.insertAdjacentHTML('beforeend','<div></div>');
+  for(let d=1;d<=dim;d++){
+    const devs=events.filter(e=>e.day===d);
+    const isPast=d<today,isT=d===today;
+    const dots=devs.map(e=>'<div class="ev-dot '+(e.type==='income'?'dot-in':e.type==='investment'?'dot-inv':'dot-ex')+'"></div>').join('');
+    grid.insertAdjacentHTML('beforeend','<div class="cal-day'+(isT?' today':isPast?' past':'')+(devs.length&&!isT?' has-ev':'')+'">'+d+(devs.length?'<div class="ev-dots">'+dots+'</div>':'')+'</div>');
+  }
+  // Month events
+  const sorted=[...events].sort((a,b)=>a.day-b.day);
+  const mel=document.getElementById('month-events-list');
+  mel.innerHTML=sorted.length?sorted.map(ev=>{
+    const isPast=ev.day<=today,ak=mk+'-'+ev.id,wasApplied=applied[ak];
+    const sign=ev.type==='income'?'+':'-';
+    const clr=ev.type==='income'?'var(--success)':'var(--danger)';
+    const dotc=ev.type==='income'?'dot-in':ev.type==='investment'?'dot-inv':'dot-ex';
+    return '<div class="event-row">'
+      +'<div class="ev-circle '+dotc+'"></div>'
+      +'<div style="flex:1"><div class="ev-name-text">'+ev.name+'</div>'
+      +'<div class="ev-when">Giorno '+ev.day+(isPast?' &middot; <span style="color:var(--success)">avvenuto</span>':'')+(wasApplied?' &middot; <span style="color:var(--success)">applicato</span>':'')+'</div></div>'
+      +'<div class="ev-amt" style="color:'+clr+'">'+sign+fmtN(ev.amount)+'</div>'
+      +(isPast&&ev.type==='investment'&&ev.assetId&&!wasApplied
+        ?'<button class="btn btn-success btn-xs" onclick="applySingleEvent('+ev.id+',\''+ak+'\')" style="margin-left:8px">Applica</button>':'')
+      +'</div>';
+  }).join(''):'<div class="t3 fs13" style="padding:14px 0">Nessun evento. Aggiungine uno con + Evento.</div>';
+  renderAllEvents();renderNextEventAlert();
+}
+
+function applySingleEvent(evId,ak){
+  const ev=getEvents().find(e=>e.id===evId);if(!ev?.assetId)return;
+  const assets=getAssets();const asset=assets.find(a=>a.id===ev.assetId);
+  if(!asset){alert('Voce non trovata nel portafoglio.');return;}
+  asset.val=parseFloat((asset.val+ev.amount).toFixed(2));setAssets(assets);
+  const app=getApplied();app[ak]={date:new Date().toISOString(),amount:ev.amount};setApplied(app);
+  renderCalendar();renderAssets();
+  alert('Aggiunto €'+fmtN(ev.amount)+' a '+asset.name+'. Nuovo valore: €'+fmtN(asset.val));
+}
+function applyPastEvents(){
+  const now=new Date(),today=now.getDate(),mk=now.getFullYear()+'-'+(now.getMonth()+1);
+  const events=getEvents().filter(e=>e.active&&e.type==='investment'&&e.assetId&&e.day<=today);
+  const app=getApplied();let count=0;
+  events.forEach(ev=>{const k=mk+'-'+ev.id;if(!app[k]){
+    const assets=getAssets();const asset=assets.find(a=>a.id===ev.assetId);
+    if(asset){asset.val=parseFloat((asset.val+ev.amount).toFixed(2));setAssets(assets);}
+    app[k]={date:new Date().toISOString(),amount:ev.amount};setApplied(app);count++;
+  }});
+  if(count===0)alert('Tutti gli eventi di investimento di questo mese sono gia stati applicati.');
+  else{renderCalendar();renderAssets();alert(count+' eventi applicati al portafoglio.');}
+}
+function renderAllEvents(){
+  const el=document.getElementById('all-events-list');if(!el)return;
+  const events=getEvents();
+  el.innerHTML=events.length?events.map(ev=>{
+    const dotc=ev.type==='income'?'dot-in':ev.type==='investment'?'dot-inv':'dot-ex';
+    return '<div class="event-row">'
+      +'<div class="ev-circle '+dotc+'"></div>'
+      +'<div style="flex:1"><div class="ev-name-text">'+ev.name+'</div>'
+      +'<div class="ev-when">Giorno '+ev.day+' &middot; '+(ev.type==='income'?'Entrata':ev.type==='investment'?'Investimento':'Uscita fissa')+'</div></div>'
+      +'<div class="ev-amt t1" style="font-size:15px">'+fmtN(ev.amount)+'</div>'
+      +'<button class="btn btn-ghost btn-xs" onclick="editEvent('+ev.id+')" style="margin-left:8px">Mod.</button></div>';
+  }).join(''):'<div class="t3 fs13" style="padding:14px 0">Nessun evento configurato.</div>';
+}
+function showEventForm(){
+  editingEventId=null;
+  document.getElementById('ef-title').textContent='Aggiungi evento';
+  ['ef-name','ef-amount','ef-day'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('ef-type').value='income';
+  document.getElementById('btn-ev-delete').classList.add('hidden');
+  document.getElementById('ef-asset-row').classList.add('hidden');
+  populateAssetSelect();
+  document.getElementById('event-form').classList.remove('hidden');
+  document.getElementById('event-form').scrollIntoView({behavior:'smooth'});
+}
+function editEvent(id){
+  const ev=getEvents().find(e=>e.id===id);if(!ev)return;
+  editingEventId=id;
+  document.getElementById('ef-title').textContent='Modifica evento';
+  document.getElementById('ef-name').value=ev.name;
+  document.getElementById('ef-type').value=ev.type;
+  document.getElementById('ef-amount').value=ev.amount;
+  document.getElementById('ef-day').value=ev.day;
+  document.getElementById('btn-ev-delete').classList.remove('hidden');
+  onEventTypeChange();populateAssetSelect(ev.assetId);
+  document.getElementById('event-form').classList.remove('hidden');
+  document.getElementById('event-form').scrollIntoView({behavior:'smooth'});
+}
+function onEventTypeChange(){
+  document.getElementById('ef-asset-row').classList.toggle('hidden',document.getElementById('ef-type').value!=='investment');
+}
+function populateAssetSelect(sel=null){
+  const s=document.getElementById('ef-asset-id');
+  s.innerHTML='<option value="">-- nessun collegamento --</option>';
+  getAssets().filter(a=>a.cat!=='debt').forEach(a=>{
+    const o=document.createElement('option');o.value=a.id;o.textContent=a.name;
+    if(a.id===sel)o.selected=true;s.appendChild(o);
+  });
+}
+function saveEvent(){
+  const name=document.getElementById('ef-name').value.trim();
+  const type=document.getElementById('ef-type').value;
+  const amount=parseFloat(document.getElementById('ef-amount').value);
+  const day=parseInt(document.getElementById('ef-day').value);
+  const assetId=type==='investment'?(parseInt(document.getElementById('ef-asset-id').value)||null):null;
+  if(!name||isNaN(amount)||amount<0||isNaN(day)||day<1||day>31){alert('Compila tutti i campi.');return;}
+  const events=getEvents();
+  if(editingEventId!==null){const i=events.findIndex(e=>e.id===editingEventId);if(i>=0)events[i]={...events[i],name,type,amount,day,assetId};}
+  else events.push({id:Math.max(0,...events.map(e=>e.id))+1,name,type,amount,day,assetId,active:true});
+  setEvents(events);cancelEventForm();renderCalendar();
+}
+function deleteEvent(){
+  if(editingEventId===null||!confirm('Eliminare?'))return;
+  setEvents(getEvents().filter(e=>e.id!==editingEventId));cancelEventForm();renderCalendar();
+}
+function cancelEventForm(){document.getElementById('event-form').classList.add('hidden');editingEventId=null;}
+
+// ── MARKET DATA ────────────────────────────────────────────────────────────
+const PROXIES=[
+  u=>'https://api.codetabs.com/v1/proxy?quest='+encodeURIComponent(u),
+  u=>'https://corsproxy.io/?'+encodeURIComponent(u),
+  u=>'https://api.allorigins.win/get?url='+encodeURIComponent(u),
+  u=>'https://thingproxy.freeboard.io/fetch/'+u,
+];
+async function fetchProxy(url,attempt=0){
+  if(attempt>=PROXIES.length)return null;
+  try{
+    const r=await fetch(PROXIES[attempt](url),{signal:AbortSignal.timeout(9000)});
+    if(!r.ok)return fetchProxy(url,attempt+1);
+    const text=await r.text();
+    if(!text||text.length<10)return fetchProxy(url,attempt+1);
+    try{
+      const p=JSON.parse(text);
+      if(p.contents!==undefined){try{return JSON.parse(p.contents);}catch{return fetchProxy(url,attempt+1);}}
+      return p;
+    }catch{return fetchProxy(url,attempt+1);}
+  }catch{return fetchProxy(url,attempt+1);}
+}
+async function fetchYahoo(sym){
+  for(const base of['https://query1.finance.yahoo.com','https://query2.finance.yahoo.com']){
+    const url=base+'/v8/finance/chart/'+sym+'?interval=1d&range=5d';
+    const d=await fetchProxy(url);
+    const meta=d?.chart?.result?.[0]?.meta;
+    if(meta){
+      const price=meta.regularMarketPrice??meta.previousClose;
+      const prev=meta.chartPreviousClose??meta.previousClose;
+      return{price,chg:prev&&prev!==0?(price-prev)/prev*100:0,currency:meta.currency||'USD'};
+    }
+  }
+  return null;
+}
+async function fetchBTC(){
+  try{
+    const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur&include_24hr_change=true',{signal:AbortSignal.timeout(8000)});
+    const d=await r.json();
+    return{price:d.bitcoin.eur,chg:d.bitcoin.eur_24h_change,currency:'EUR'};
+  }catch{return null;}
+}
+function setPriceEl(vid,cid,data){
+  const ev=document.getElementById(vid),ec=document.getElementById(cid);
+  if(!data){ev.innerHTML='<span class="price-loading">N/D</span>';if(ec)ec.textContent='';return;}
+  const sym=data.currency==='EUR'?'€':data.currency==='USD'?'$':data.currency+' ';
+  ev.textContent=sym+data.price.toLocaleString('it-IT',{maximumFractionDigits:2,minimumFractionDigits:2});
+  if(ec){ec.textContent=(data.chg>=0?'+':'')+data.chg.toFixed(2)+'%';ec.className='price-chg '+(data.chg>=0?'pos':'neg');}
+}
+let pCache={};
+async function loadPrices(force=false){
+  const now=Date.now();
+  if(!force&&pCache._ts&&now-pCache._ts<4*60*1000)return;
+  document.getElementById('price-ts').textContent='Aggiornamento...';
+  const[vuaa,embc,btc,sp,gold,vwce]=await Promise.all([
+    fetchYahoo('VUAA.MI'),fetchYahoo('EMBC'),fetchBTC(),
+    fetchYahoo('%5EGSPC'),fetchYahoo('GC%3DF'),fetchYahoo('VWCE.MI'),
+  ]);
+  setPriceEl('p-vuaa','pc-vuaa',vuaa);setPriceEl('p-embc','pc-embc',embc);
+  setPriceEl('p-btc','pc-btc',btc);setPriceEl('p-sp','pc-sp',sp);
+  setPriceEl('p-gold','pc-gold',gold);setPriceEl('p-vwce','pc-vwce',vwce);
+  pCache={vuaa,embc,btc,sp,gold,vwce,_ts:now};
+  document.getElementById('price-ts').textContent='Aggiornato '+new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+}
+
+// ── NEWS ───────────────────────────────────────────────────────────────────
+const RSS={
+  ansa:'https://www.ansa.it/sito/notizie/economia/economia_rss.xml',
+  sole:'https://www.ilsole24ore.com/rss/finanza--e-mercati.xml'
+};
+const VUAA_KW=['s&p','sp500','wall street','nasdaq','fed ','federal reserve','usa ','stati uniti','borsa','inflazione','recessione','etf '];
+let curSrc='ansa';
+async function loadNews(src){
+  curSrc=src||curSrc;
+  ['ansa','sole'].forEach(s=>{
+    const b=document.getElementById('src-'+s);if(!b)return;
+    b.className='btn btn-sm '+(s===curSrc?'btn-primary':'btn-ghost');
+  });
+  const loader=document.getElementById('news-loader'),list=document.getElementById('news-list');
+  loader.style.display='block';list.innerHTML='';
+  try{
+    // rss2json converte RSS XML in JSON direttamente - nessun problema CORS
+    const apiUrl='https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(RSS[curSrc])+'&count=20';
+    const r=await fetch(apiUrl,{signal:AbortSignal.timeout(12000)});
+    if(!r.ok)throw new Error('rss2json error '+r.status);
+    const data=await r.json();
+    if(data.status!=='ok'||!data.items?.length)throw new Error('no items');
+    loader.style.display='none';
+    list.innerHTML=data.items.map(item=>{
+      const title=item.title||'';
+      const link=item.link||'#';
+      const date=item.pubDate||'';
+      const desc=(item.description||'').replace(/<[^>]+>/g,'').trim().slice(0,120);
+      const isVuaa=VUAA_KW.some(k=>title.toLowerCase().includes(k));
+      const ds=date?new Date(date).toLocaleString('it-IT',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'';
+      return '<div class="news-item">'
+        +(isVuaa?'<span class="badge badge-success" style="margin-bottom:4px">VUAA</span> ':'')
+        +'<a class="news-title-link" href="'+link+'" target="_blank" rel="noopener">'+title+'</a>'
+        +(desc?'<div class="news-desc">'+desc+'...</div>':'')
+        +'<div class="news-meta">'+ds+'</div></div>';
+    }).join('');
+    document.getElementById('news-ts').textContent='Aggiornato '+new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+  }catch{
+    loader.style.display='none';
+    list.innerHTML='<div class="alert alert-warn fs12">Notizie non disponibili. '
+      +'<a href="https://www.ansa.it/economia/" target="_blank" style="color:var(--primary2)">Apri ANSA</a> &nbsp; '
+      +'<a href="https://www.ilsole24ore.com/finanza-e-mercati" target="_blank" style="color:var(--primary2)">Il Sole 24 Ore</a></div>';
+  }
+}
+
+// ── API KEY ────────────────────────────────────────────────────────────────
+function saveApiKey(){
+  const k=document.getElementById('api-key-input').value.trim();
+  if(!k.startsWith('gsk_')){alert('La chiave Groq deve iniziare con gsk_\nOttienila gratis su console.groq.com');return;}
+  setGroqKey(k);renderApiKeyStatus();
+  autoBriefing();
+}
+function renderApiKeyStatus(){
+  const k=getGroqKey();
+  const el=document.getElementById('api-key-status');if(!el)return;
+  el.innerHTML=k?'<span class="badge badge-success">✓ Groq attivo</span>'
+    :'<span class="badge badge-warn">Nessuna chiave</span>';
+  const inp=document.getElementById('api-key-input');
+  if(inp&&k)inp.placeholder='(chiave salvata)';
+}
+
+// ── MARKDOWN RENDERER ──────────────────────────────────────────────────────
+function renderMd(raw){
+  let s=raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  s=s.replace(/\*\*([^*\n]+)\*\*/g,'<strong>$1</strong>');
+  s=s.replace(/\*([^*\n]+)\*/g,'<em>$1</em>');
+  s=s.replace(/^#{1,3} (.+)$/gm,'<div class="md-h">$1</div>');
+  s=s.replace(/^[-•] (.+)$/gm,'<li>$1</li>');
+  s=s.replace(/^\d+\. (.+)$/gm,'<li>$1</li>');
+  s=s.replace(/(<li>[^<]*<\/li>\n?)+/g,m=>'<ul>'+m+'</ul>');
+  s=s.replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>');
+  return s;
+}
+
+// ── GROQ API ───────────────────────────────────────────────────────────────
+async function callGroq(messages){
+  const key=getGroqKey();
+  if(!key)throw new Error('Inserisci prima la chiave Groq (console.groq.com)');
+  const resp=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+    body:JSON.stringify({
+      model:'llama-3.3-70b-versatile',
+      max_tokens:1200,
+      messages:[{role:'system',content:buildSystem()},...messages]
+    }),
+    signal:AbortSignal.timeout(30000)
+  });
+  const data=await resp.json();
+  if(!resp.ok)throw new Error(data.error?.message||'Errore Groq');
+  return data.choices[0].message.content;
+}
+
+// ── SYSTEM PROMPT ──────────────────────────────────────────────────────────
+function buildSystem(){
+  const{assets,actives,debts,net}=computeTotals();
+  const today=new Date().toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'});
+  const todayN=new Date().getDate();
+  const upcoming=getEvents().filter(e=>e.active&&e.day>=todayN).sort((a,b)=>a.day-b.day).slice(0,3);
+  return`Sei l'agente finanziario AI di questo utente italiano. Rispondi SEMPRE in italiano, in modo diretto e numerico. Usa **grassetto** per i dati chiave. Puoi usare liste con - per gli elenchi.
+
+PROFILO: 22 anni, €2.300/mese netto, spese €1.700 ora (da giugno €490 fissi), profilo rischio molto aggressivo.
+Oggi: ${today}
+
+PORTAFOGLIO (ID→voce→valore):
+${assets.map(a=>`  ID${a.id} ${a.name} (${a.cat}): €${fmtN(a.val)}${a.ticker?' ['+a.ticker+']':''}`).join('\n')}
+Attivi: €${fmtN(actives)} | Debiti: €${fmtN(debts)} | Netto: €${fmtN(net)} | FIRE: ${(actives/550000*100).toFixed(2)}%
+
+PROSSIMI EVENTI:
+${upcoming.map(e=>`  Giorno ${e.day}: ${e.name} €${fmtN(e.amount)}`).join('\n')||'  Nessuno impostato'}
+
+PIANO:
+- Ora: VUAA €150/mese il 12, extra debito €250/mese
+- Da giugno: VUAA €600/mese, extra debito €600/mese → debito zero feb 2027
+- Da mar 2027: €1.200+/mese (80% VUAA + 20% VWCE) → FIRE number €550.000
+
+AGGIORNA PORTAFOGLIO: Se l'utente descrive un evento finanziario reale (stipendio ricevuto, acquisto ETF, variazione saldo), dopo la risposta italiana includi:
+[AZIONI]
+[{"assetId":ID_NUMERO,"newVal":VALORE_ASSOLUTO_EUR,"label":"motivo"}]
+[/AZIONI]
+newVal = valore ASSOLUTO aggiornato (non il delta). Ometti il blocco se non sei sicuro o non ci sono aggiornamenti.`;
+}
+
+// ── AUTO BRIEFING ──────────────────────────────────────────────────────────
+async function autoBriefing(){
+  if(!getGroqKey())return;
+  const today=new Date().toDateString();
+  if(localStorage.getItem('gp_last_briefing')===today)return;
+  localStorage.setItem('gp_last_briefing',today);
+  const loadEl=addMsgLoading();
+  try{
+    const prompt=`Genera il briefing del giorno. Usa **grassetto** per i numeri. Formato esatto (4 righe):
+📊 **Portafoglio**: [un dato numerico chiave + variazione rispetto al piano]
+📅 **Prossimo**: [evento più vicino dal calendario con data e importo]
+⚡ **Azione oggi**: [una cosa concreta e specifica da fare oggi]
+🔥 **Motivazione**: [una frase breve e diretta]
+
+Solo 4 righe. Niente intro, niente saluti, niente conclusioni.`;
+    const reply=await callGroq([{role:'user',content:prompt}]);
+    const clean=cleanAgentText(reply);
+    loadEl.remove();
+    const box=document.getElementById('chat-box');
+    const d=document.createElement('div');
+    d.className='msg ai briefing';
+    d.innerHTML='<div style="font-size:10px;font-weight:800;color:var(--primary2);letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px">☀ Briefing di oggi</div>'+renderMd(clean);
+    box.appendChild(d);box.scrollTop=box.scrollHeight;
+  }catch{loadEl.remove();}
+}
+
+// ── QUICK QUESTIONS ────────────────────────────────────────────────────────
+function quickAsk(text){
+  const inp=document.getElementById('chat-input');
+  inp.value=text;
+  sendChat();
+}
+
+// ── CHAT AGENT ─────────────────────────────────────────────────────────────
+let chatHist=[];
+let pendingImageB64=null,pendingImageMime=null;
+
+function addMsg(role,text){
+  const box=document.getElementById('chat-box');
+  const d=document.createElement('div');
+  d.className='msg '+role;
+  if(role==='ai')d.innerHTML=renderMd(text);else d.textContent=text;
+  box.appendChild(d);box.scrollTop=box.scrollHeight;
+  return d;
+}
+function addMsgLoading(){
+  const box=document.getElementById('chat-box');
+  const d=document.createElement('div');
+  d.className='msg ai';
+  d.innerHTML='<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
+  box.appendChild(d);box.scrollTop=box.scrollHeight;
+  return d;
+}
+
+function parseAgentActions(text){
+  const m=text.match(/\[AZIONI\]([\s\S]*?)\[\/AZIONI\]/);
+  if(!m)return null;
+  try{return JSON.parse(m[1].trim());}catch{return null;}
+}
+function cleanAgentText(text){
+  return text.replace(/\[AZIONI\][\s\S]*?\[\/AZIONI\]/g,'').trim();
+}
+
+let _pendingActionsData=[];
+function showPendingActions(actions){
+  const el=document.getElementById('pending-actions');
+  if(!el||!actions?.length){if(el)el.classList.add('hidden');return;}
+  _pendingActionsData=[...actions];
+  el.classList.remove('hidden');
+  renderPendingActions();
+}
+function renderPendingActions(){
+  const el=document.getElementById('pending-actions');if(!el)return;
+  if(!_pendingActionsData.length){el.classList.add('hidden');return;}
+  el.innerHTML='<div style="font-size:11px;font-weight:800;color:var(--warn);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">⚡ Aggiornamenti suggeriti</div>'
+    +_pendingActionsData.map((a,i)=>{
+      const asset=getAssets().find(x=>x.id===a.assetId);
+      if(!asset)return '';
+      return '<div class="action-row">'
+        +'<span class="badge badge-warn" style="flex:1;min-width:0">'+asset.name+': '+fmtN(asset.val)+' → '+fmtN(a.newVal)+'</span>'
+        +(a.label?'<span class="fs11 t3" style="flex-shrink:0">'+a.label+'</span>':'')
+        +'<button class="btn btn-success btn-xs" onclick="applyOneAction('+i+')">Applica</button>'
+        +'<button class="btn btn-ghost btn-xs" onclick="dismissAction('+i+')">✕</button></div>';
+    }).join('')
+    +(_pendingActionsData.length>1
+      ?'<button class="btn btn-primary btn-sm btn-full mt8" onclick="applyAllActions()">Applica tutte</button>':'');
+}
+function applyOneAction(i){
+  const a=_pendingActionsData[i];if(!a)return;
+  const assets=getAssets();
+  const asset=assets.find(x=>x.id===a.assetId);
+  if(!asset){addMsg('ai','Asset non trovato nel portafoglio.');return;}
+  const oldVal=asset.val;
+  asset.val=parseFloat((+a.newVal).toFixed(2));
+  setAssets(assets);renderAssets();
+  addMsg('ai','✅ **'+asset.name+'** aggiornato: €'+fmtN(oldVal)+' → €'+fmtN(asset.val));
+  _pendingActionsData.splice(i,1);
+  renderPendingActions();
+}
+function dismissAction(i){_pendingActionsData.splice(i,1);renderPendingActions();}
+function applyAllActions(){while(_pendingActionsData.length)applyOneAction(0);}
+
+async function sendChat(){
+  const inp=document.getElementById('chat-input');
+  const text=inp.value.trim();
+  if(!text&&!pendingImageB64)return;
+  if(!getGroqKey()){alert('Inserisci prima la chiave Groq (gratuita su console.groq.com)');return;}
+
+  let userText=text,userLabel=text;
+  if(pendingImageB64){
+    userLabel='📷 '+(text||'Screenshot allegato');
+    userText=(text?text+'\n\n':'')+'[Screenshot allegato — descrivimi i valori che vedi: nome asset, valore in EUR. Se è uno screenshot Revolut, elenca ogni investimento con nome e valore.]';
+    clearImage();
+  }
+  addMsg('user',userLabel);
+  chatHist.push({role:'user',content:userText});
+  inp.value='';
+  const loadEl=addMsgLoading();
+  try{
+    const fullReply=await callGroq(chatHist);
+    const cleanReply=cleanAgentText(fullReply);
+    const actions=parseAgentActions(fullReply);
+    loadEl.remove();
+    addMsg('ai',cleanReply);
+    chatHist.push({role:'assistant',content:fullReply});
+    if(chatHist.length>20)chatHist=chatHist.slice(-20);
+    if(actions?.length)showPendingActions(actions);
+  }catch(e){
+    loadEl.remove();
+    addMsg('ai','Errore: '+(e.message||'controlla la chiave.'));
+    chatHist.pop();
+  }
+}
+function onChatKey(e){if(e.key==='Enter'&&(e.ctrlKey||e.metaKey))sendChat();}
+
+// ── IMAGE UPLOAD ───────────────────────────────────────────────────────────
+function onImageUpload(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const dataUrl=ev.target.result;
+    pendingImageB64=dataUrl.split(',')[1];
+    pendingImageMime=file.type||'image/jpeg';
+    const prev=document.getElementById('img-preview');
+    const area=document.getElementById('img-preview-area');
+    prev.src=dataUrl;
+    area.classList.remove('hidden');
+  };
+  reader.readAsDataURL(file);
+}
+function clearImage(){
+  pendingImageB64=null;pendingImageMime=null;
+  document.getElementById('img-preview-area').classList.add('hidden');
+  document.getElementById('img-upload').value='';
+}
+
+// ── AUTO REFRESH ───────────────────────────────────────────────────────────
+setInterval(()=>{if(document.getElementById('tab-news').classList.contains('active')){loadPrices(false);loadNews();}},5*60*1000);
+
+// ── INIT ───────────────────────────────────────────────────────────────────
+renderAssets();calcDebt();updateSim();renderCalendar();renderApiKeyStatus();
+
+let lastTouch=0;
+document.addEventListener('touchend',e=>{const n=Date.now();if(n-lastTouch<=300)e.preventDefault();lastTouch=n;},{passive:false});
+if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body>
+</html>
